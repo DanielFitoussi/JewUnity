@@ -1,0 +1,41 @@
+.form-fields {
+    margin-bottom: 15px;
+
+}
+
+.input-signIn {
+    border-width: 0.01;
+    width: 464px;
+}
+
+.input-signUp {
+    border-width: 0.01;
+    width: 200px;
+    margin-right: 10px;
+}
+
+
+#parg-signIn {
+    color: rgb(96, 96, 96);
+    font-weight: normal;
+    font-size: 16px;
+}
+
+.btn-primary {
+    border-radius: 20px;
+}
+
+#parg-dateSignUp {
+    color: rgb(96, 96, 96);
+    font-size: 12px;
+    margin-bottom: 2px;
+   
+}
+
+#parg-genderSignUp {
+    color: rgb(96, 96, 96);
+    font-size: 12px;
+    margin-bottom: 2px;
+    margin-left: 134px; 
+}
+
