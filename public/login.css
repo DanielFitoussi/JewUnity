@@ -1,3 +1,17 @@
+* {
+    font-family: 'Assistant', sans-serif;
+    font-family: ui sans;
+
+}
+
+body {
+    background: linear-gradient(to right, white, #85b5fc);
+    /* לבן למעלה, כחול למטה */
+    min-height: 100vh;
+    margin: 0;
+}
+
+
 .form-fields {
     margin-bottom: 15px;
 
@@ -21,21 +35,82 @@
     font-size: 16px;
 }
 
-.btn-primary {
-    border-radius: 20px;
+.w-38 {
+    width: 34%;
 }
+
+.w-10{
+width: 16%;
+}
+.tallBtnSign {
+     height: 50px;         
+  line-height: 60px;      
+  font-size: 18px;        
+  padding: 0 20px;
+}
+
+.tallBtnDownload{
+    height: 53px;         
+  line-height: 60px;      
+  font-size: 18px;        
+  padding: 0 20px;
+}
+
 
 #parg-dateSignUp {
     color: rgb(96, 96, 96);
     font-size: 12px;
     margin-bottom: 2px;
-   
+
 }
 
 #parg-genderSignUp {
     color: rgb(96, 96, 96);
     font-size: 12px;
     margin-bottom: 2px;
-    margin-left: 134px; 
+    margin-left: 134px;
 }
 
+
+.btn-primary {
+    background-color: rgb(46, 46, 242) !important;
+}
+
+.login-box {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-left: 25px;
+    padding-top: 200px;
+}
+
+#pargTermsOfService {
+    font-size: 12px;
+    color: rgb(96, 96, 96);
+    margin-left: 50px;
+}
+
+.linkTermsOfService{
+color: rgb(96, 96, 96);
+}
+
+.linkFooter {
+    color: rgb(96, 96, 96);
+    font-size: 12px;
+     text-decoration: none;
+    
+}
+
+.footerLinks{
+margin-left: 50px;
+
+}
+.downloadName{
+    font-weight: bold;
+}
+
+#site-footer-note{
+     font-size: 12px;
+    color: rgb(96, 96, 96);
+    margin-left: 150px;
+}
