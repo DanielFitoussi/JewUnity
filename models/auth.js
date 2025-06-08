@@ -1,5 +1,7 @@
 const users = []
 
+
+
 function addUser(user) {
   users.push(user);
 }
@@ -19,9 +21,12 @@ function clearUsers() {
 }
 
 
+
+
 module.exports = {
   addUser,
   findUser,
   isUsernameTaken,
-  clearUsers
+  clearUsers,
+  
 };

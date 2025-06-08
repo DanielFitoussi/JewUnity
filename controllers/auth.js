@@ -1,5 +1,6 @@
 const authModel = require('../models/auth')
 
+
 const registerUser = (req, res) => {
   const { username, password, gender, birthDate, firstName, lastName } = req.body;
 
@@ -18,18 +19,18 @@ const registerUser = (req, res) => {
 
 
 const loginUser = (req, res) => {
-    const { username, password } = req.body
+  const { username, password } = req.body
 
-    if (!username || !password)
-        return res.status(400).json({ error: 'Username and password are required' });
+  if (!username || !password)
+    return res.status(400).json({ error: 'Username and password are required' });
 
 
-   const user = authModel.findUser(username, password);
+  const user = authModel.findUser(username, password);
 
-    if (!user)
-        return res.status(401).json({ error: 'Invalid username or password' });
+  if (!user)
+    return res.status(401).json({ error: 'Invalid username or password' });
 
-    res.status(200).json({ message: 'User logged in successfully' });
+  res.status(200).json({ message: 'User logged in successfully' });
 
 
 }
@@ -41,7 +42,7 @@ const clearUsers = (req, res) => {
 
 
 module.exports = {
-    registerUser,
-    loginUser,
-    clearUsers
+  registerUser,
+  loginUser,
+  clearUsers,
 };

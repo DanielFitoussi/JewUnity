@@ -2,12 +2,15 @@ const express = require('express')
 const app = express()
 const authRoutes = require('./routes/auth')
 const testRoutes = require('./routes/test')
+const postsRoutes = require('./routes/posts')
+
 
 
 app.use(express.json())
 
 app.use('/', testRoutes)
-app.use('/api', authRoutes);
+app.use('/api', authRoutes)
+app.use('/api', postsRoutes)
 
 
 app.get('/api', (req, res) => {
