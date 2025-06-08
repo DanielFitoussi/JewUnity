@@ -10,6 +10,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const postElement = document.createElement('div');
     postElement.classList.add('card', 'mb-3');
 
+        // === מדיה (אם קיימת) ===
+    const fileInput = document.getElementById('postImage');
+    const file = fileInput.files[0];
+
+    let postType = 'text'
+    if (file) {
+      if (file.type.startsWith('image/')) {
+        postType = 'image'
+
+      } else if (file.type.startsWith('video/')) {
+        postType = 'video'
+      }
+    }
+    postElement.dataset.type = postType
+
     const cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
 
@@ -166,9 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // === מדיה (אם קיימת) ===
-    const fileInput = document.getElementById('postImage');
-    const file = fileInput.files[0];
+
 
     if (file) {
       const mediaURL = URL.createObjectURL(file);
@@ -191,5 +204,27 @@ document.addEventListener('DOMContentLoaded', () => {
     postElement.appendChild(cardBody);
     postsContainer.prepend(postElement);
     postForm.reset();
+
+    
+    
+  });
+
+document.querySelectorAll('.filter-option').forEach(option => {
+  option.addEventListener('click', (e) => {
+    e.preventDefault(); // כדי למנוע מעבר קישור
+    const filter = option.dataset.filter;
+
+    document.querySelectorAll('#postsContainer .card').forEach(post => {
+      const type = post.dataset.type;
+      if (filter === 'all' || type === filter) {
+        post.style.display = 'block';
+      } else {
+        post.style.display = 'none';
+      }
+    });
   });
 });
+
+});
+
+
