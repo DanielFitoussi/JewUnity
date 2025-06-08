@@ -27,7 +27,7 @@ body {
   font-family: Arial, sans-serif;
 }
 
-/* עיצוב כפתור */
+/* עיצוב כפתור שליחת פוסט */
 button[type="submit"] {
   width: 100%;
   font-weight: bold;
@@ -38,3 +38,49 @@ button[type="submit"] {
   margin-top: 1rem;
 }
 
+/* כפתורי לייק ותגובה - סגנון אחיד */
+.btn-icon {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 1.3rem;
+  cursor: pointer;
+  outline: none;
+  color: #666;
+  line-height: 1;
+}
+
+.btn-icon:hover {
+  transform: scale(1.1);
+  transition: 0.2s;
+  color: #1da1f2;
+}
+
+.btn-icon:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* תגובה בודדת */
+.comment {
+  background-color: #f1f1f1;
+  border-radius: 10px;
+  padding: 5px 10px;
+  margin-top: 5px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+/* מידע משתמש */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* תאריך */
+.post-date {
+  font-size: 0.8rem;
+  color: #888;
+  white-space: nowrap;
+}

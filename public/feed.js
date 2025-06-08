@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
   const postForm = document.getElementById('postForm');
   const postsContainer = document.getElementById('postsContainer');
 
@@ -8,20 +7,115 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const content = document.getElementById('postContent').value;
 
-    // יצירת כרטיס Bootstrap
     const postElement = document.createElement('div');
     postElement.classList.add('card', 'mb-3');
 
     const cardBody = document.createElement('div');
     cardBody.classList.add('card-body');
 
+    // === כותרת עם שם משתמש + תאריך + אייקון ===
+    const postHeader = document.createElement('div');
+postHeader.classList.add('d-flex', 'justify-content-between', 'align-items-center', 'mb-2');
+
+// צד שמאל: אייקון + שם
+const userInfo = document.createElement('div');
+userInfo.classList.add('d-flex', 'align-items-center', 'gap-2');
+
+const avatarIcon = document.createElement('i');
+avatarIcon.classList.add('bi', 'bi-person-circle', 'fs-4', 'text-secondary');
+
+const username = document.createElement('strong');
+username.textContent = 'User123';
+
+userInfo.appendChild(avatarIcon);
+userInfo.appendChild(username);
+
+// צד ימין: תאריך
+const date = document.createElement('small');
+date.classList.add('text-muted');
+date.textContent = new Date().toLocaleDateString();
+
+// שילוב לתוך header
+postHeader.appendChild(userInfo);
+postHeader.appendChild(date);
+cardBody.appendChild(postHeader);
+
+    // === טקסט הפוסט ===
     const textElement = document.createElement('p');
     textElement.classList.add('card-text');
     textElement.textContent = content;
-
     cardBody.appendChild(textElement);
 
-    // הוספת מדיה (אם קיימת)
+    // === כפתורי לייק ותגובה ===
+    const actionsWrapper = document.createElement('div');
+    actionsWrapper.classList.add('d-flex', 'align-items-center', 'gap-3', 'mt-2');
+
+    const likeBtn = document.createElement('button');
+    likeBtn.classList.add('btn-icon');
+    likeBtn.innerHTML = '<i class="bi bi-heart"></i>';
+    let liked = false;
+    let likeCount = 0;
+    const likeCountSpan = document.createElement('span');
+    likeCountSpan.textContent = likeCount;
+
+    likeBtn.addEventListener('click', () => {
+      const icon = likeBtn.querySelector('i');
+      liked = !liked;
+      likeCount += liked ? 1 : -1;
+      icon.className = liked ? 'bi bi-heart-fill text-danger' : 'bi bi-heart';
+      likeCountSpan.textContent = likeCount;
+    });
+
+    const commentBtn = document.createElement('button');
+    commentBtn.classList.add('btn-icon');
+    commentBtn.innerHTML = '<i class="bi bi-chat"></i>';
+    let commentCount = 0;
+    const commentCountSpan = document.createElement('span');
+    commentCountSpan.textContent = commentCount;
+
+    actionsWrapper.appendChild(likeBtn);
+    actionsWrapper.appendChild(likeCountSpan);
+    actionsWrapper.appendChild(commentBtn);
+    actionsWrapper.appendChild(commentCountSpan);
+    cardBody.appendChild(actionsWrapper);
+
+    // === אזור תגובות ===
+    const commentSection = document.createElement('div');
+    commentSection.style.display = 'none';
+    commentSection.classList.add('mt-2');
+
+    const commentInput = document.createElement('input');
+    commentInput.type = 'text';
+    commentInput.placeholder = 'כתוב תגובה...';
+    commentInput.classList.add('form-control', 'form-control-sm', 'mb-2');
+
+    const commentList = document.createElement('div');
+    commentList.classList.add('comment-list');
+
+    commentSection.appendChild(commentInput);
+    commentSection.appendChild(commentList);
+    cardBody.appendChild(commentSection);
+
+    commentBtn.addEventListener('click', () => {
+      commentSection.style.display = commentSection.style.display === 'none' ? 'block' : 'none';
+    });
+
+    commentInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const text = commentInput.value.trim();
+        if (text !== '') {
+          const comment = document.createElement('div');
+          comment.classList.add('comment');
+          comment.textContent = text;
+          commentList.appendChild(comment);
+          commentInput.value = '';
+          commentCount++;
+          commentCountSpan.textContent = commentCount;
+        }
+      }
+    });
+
+    // === מדיה (אם קיימת) ===
     const fileInput = document.getElementById('postImage');
     const file = fileInput.files[0];
 
@@ -47,5 +141,4 @@ document.addEventListener('DOMContentLoaded', () => {
     postsContainer.prepend(postElement);
     postForm.reset();
   });
-
 });
