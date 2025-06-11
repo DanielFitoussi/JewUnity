@@ -1,10 +1,13 @@
 const express = require('express')
 const app = express()
+const connectDB = require('./config/db')
+
 const authRoutes = require('./routes/auth')
 const testRoutes = require('./routes/test')
 const postsRoutes = require('./routes/posts')
+const { connect } = require('mongoose')
 
-
+connectDB ();
 
 app.use(express.json())
 
