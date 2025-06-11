@@ -3,7 +3,7 @@ const Post = require('../models/posts');
 // שליפת כל הפוסטים
 const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 }); // שליפה לפי תאריך חדש קודם
+    const posts = await Post.find().sort({ createdAt: -1 }).populate('author','username firstNmae lastName'); // שליפה לפי תאריך חדש קודם
     res.json(posts);
   } catch (err) {
     console.error(err);
