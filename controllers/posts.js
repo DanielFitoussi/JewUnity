@@ -1,32 +1,41 @@
-const postsModel = require('../models/posts')
+const Post = require('../models/posts');
 
-function getPosts(req, res) {
-  res.json(postsModel.getAllPosts())
-}
+// שליפת כל הפוסטים
+const getPosts = async (req, res) => {
+  try {
+    const posts = await Post.find().sort({ createdAt: -1 }); // שליפה לפי תאריך חדש קודם
+    res.json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 
-function createPost(req, res) {
+// יצירת פוסט חדש
+const createPost = async (req, res) => {
   const { content, author, mediaUrl, mediaType } = req.body;
 
-  if (!content || !author)
-    return res.status(400).json({ error: 'Missing content or author' })
-
-
-
-  const newPost = {
-    id: Date.now().toString(),
-    content,
-    author,
-    mediaUrl: mediaUrl || null,
-    mediaType: mediaType || 'text',
-    createdAt: new Date().toISOString()
+  if (!content || !author) {
+    return res.status(400).json({ error: 'Missing content or author' });
   }
 
-  postsModel.addPost(newPost)
-  res.status(201).json(newPost)
+  try {
+    const newPost = new Post({
+      content,
+      author,
+      mediaUrl: mediaUrl || null,
+      mediaType: mediaType || 'text'
+    });
 
-}
+    await newPost.save();
+    res.status(201).json(newPost);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 
-module.exports={
-    getPosts,
+module.exports = {
+  getPosts,
   createPost
-}
+};

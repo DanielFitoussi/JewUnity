@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const connectDB = require('./config/db')
 
-const authRoutes = require('./routes/auth')
+const userRoutes = require('./routes/user');
 const testRoutes = require('./routes/test')
 const postsRoutes = require('./routes/posts')
 const { connect } = require('mongoose')
@@ -12,7 +12,7 @@ connectDB ();
 app.use(express.json())
 
 app.use('/', testRoutes)
-app.use('/api', authRoutes)
+app.use('/api', userRoutes)
 app.use('/api', postsRoutes)
 
 
