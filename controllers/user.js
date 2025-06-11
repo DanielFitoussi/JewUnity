@@ -1,5 +1,7 @@
 const User = require('../models/user');
 
+const bcrypt = require('bcrypt')
+
 // רישום משתמש
 const registerUser = async (req, res) => {
   const { username, password, gender, birthDate, firstName, lastName } = req.body;
@@ -14,9 +16,12 @@ const registerUser = async (req, res) => {
       return res.status(409).json({ error: 'Username already exists' });
     }
 
+    const saltRounds = 10
+    const hashedPassword = await bcrypt.hash(password, saltRounds)
+
     const newUser = new User({
       username,
-      password,
+     password: hashedPassword,
       gender,
       birthDate,
       firstName,
@@ -40,9 +45,16 @@ const loginUser = async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ username, password });
+    const user = await User.findOne({ username });
 
+  
     if (!user) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
@@ -52,6 +64,7 @@ const loginUser = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 // ניקוי כל המשתמשים (למטרת בדיקות)
 const clearUsers = async (req, res) => {
