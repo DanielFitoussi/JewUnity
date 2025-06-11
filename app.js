@@ -12,8 +12,8 @@ connectDB ();
 app.use(express.json())
 
 app.use('/', testRoutes)
-app.use('/api', userRoutes)
-app.use('/api', postsRoutes)
+app.use('/api/users', userRoutes)
+app.use('/api/posts', postsRoutes)
 
 
 app.get('/api', (req, res) => {

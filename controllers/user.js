@@ -1,6 +1,7 @@
 const User = require('../models/user');
-
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');  
+const JWT_SECRET = 'mySecretKey123';  
 
 // רישום משתמש
 const registerUser = async (req, res) => {
@@ -16,12 +17,12 @@ const registerUser = async (req, res) => {
       return res.status(409).json({ error: 'Username already exists' });
     }
 
-    const saltRounds = 10
-    const hashedPassword = await bcrypt.hash(password, saltRounds)
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const newUser = new User({
       username,
-     password: hashedPassword,
+      password: hashedPassword,      
       gender,
       birthDate,
       firstName,
@@ -47,7 +48,6 @@ const loginUser = async (req, res) => {
   try {
     const user = await User.findOne({ username });
 
-  
     if (!user) {
       return res.status(401).json({ error: 'Invalid username or password' });
     }
@@ -58,13 +58,19 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
-    res.status(200).json({ message: 'User logged in successfully' });
+ 
+    const token = jwt.sign(
+      { userId: user._id, username: user.username },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.status(200).json({ message: 'User logged in successfully', token });  // 🚀 כאן החזרת הטוקן נוספה
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
 };
-
 
 // ניקוי כל המשתמשים (למטרת בדיקות)
 const clearUsers = async (req, res) => {
