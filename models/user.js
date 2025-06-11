@@ -33,6 +33,7 @@ username: {
 
 })
 
- const User = mongoose.model('User' , userSchema)
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+
 
  module.exports = User;

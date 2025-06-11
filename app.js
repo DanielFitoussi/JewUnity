@@ -7,10 +7,15 @@ const testRoutes = require('./routes/test')
 const postsRoutes = require('./routes/posts')
 const { connect } = require('mongoose')
 
+const groupRoutes = require('./routes/groups');
+
+
+
+
 connectDB ();
 
 app.use(express.json())
-
+app.use('/api/groups', groupRoutes);
 app.use('/', testRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/posts', postsRoutes)
