@@ -8,6 +8,8 @@ router.post('/', authenticateToken, postsController.createPost);
 router.delete('/clear', authenticateToken, postsController.clearPosts);
 router.delete('/:id', authenticateToken, postsController.deletePost);
 router.put('/:id', authenticateToken, postsController.updatePost);
+router.get('/stats-per-group', authenticateToken, postsController.getPostsCountPerGroup);
+router.get('/stats-per-user', authenticateToken, postsController.getPostsCountPerUser);
 
 
 

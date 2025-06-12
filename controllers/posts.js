@@ -104,11 +104,39 @@ const updatePost = async (req, res) => {
   }
 };
 
+const getPostsCountPerGroup = async (req, res) => {
+  try {
+    const stats = await Post.aggregate([
+      { $group: { _id: "$groupId", postsCount: { $sum: 1 } } }
+    ]);
+
+    res.status(200).json(stats);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+const getPostsCountPerUser = async (req, res) => {
+  try {
+    const stats = await Post.aggregate([
+      { $group: { _id: "$author", postsCount: { $sum: 1 } } }
+    ]);
+
+    res.status(200).json(stats);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
 
 module.exports = {
   getPosts,
   createPost,
    deletePost,
    updatePost,
-  clearPosts
+  clearPosts,
+  getPostsCountPerGroup,
+  getPostsCountPerUser
 };

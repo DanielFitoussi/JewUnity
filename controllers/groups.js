@@ -160,6 +160,47 @@ const getAdvancedGroupStats = async (req, res) => {
   }
 };
 
+const updateGroup = async (req, res) => {
+  const { groupId } = req.params;
+  const { name, description } = req.body;
+
+  try {
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found' });
+    }
+
+    if (name) group.name = name;
+    if (description) group.description = description;
+
+    await group.save();
+
+    res.status(200).json({ message: 'Group updated successfully', group });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+const deleteGroup = async (req, res) => {
+  const { groupId } = req.params;
+
+  try {
+    const group = await Group.findByIdAndDelete(groupId);
+
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found' });
+    }
+
+    res.status(200).json({ message: 'Group deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
 
 
 
@@ -169,5 +210,7 @@ module.exports = {
   addMemberToGroup,
   searchGroups,
   getGroupStats,
-  getAdvancedGroupStats
+  getAdvancedGroupStats,
+  deleteGroup,
+  updateGroup
 };
