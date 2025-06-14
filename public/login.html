@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>JewUnity - Login & Register</title>
 
     <link rel="stylesheet" href="login.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -14,17 +14,16 @@
 
 <body>
 
-
     <div class="login-box">
         <h3>"הִנֵּה מַה-טּוֹב וּמַה-נָּעִים, שֶׁבֶת אַחִים גַּם-יָחַד"</h3>
 
-        <!-- כפתור הרשמה-->
-        <button type="button" class="btn btn-primary rounded-pill w-38 loginPageBtn d-block tallBtnSign "
+        <!-- כפתור הרשמה -->
+        <button type="button" class="btn btn-primary rounded-pill w-38 loginPageBtn d-block tallBtnSign"
             data-bs-toggle="modal" data-bs-target="#signUpModal">
             Create Account
         </button>
 
-        <!--מודל - הרשמה-->
+        <!-- מודל הרשמה -->
         <div class="modal fade" id="signUpModal" tabindex="-1" aria-labelledby="signUpModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -33,10 +32,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form action="">
+                        <form id="register-form">
                             <div class="form-fields">
-                                <input type="text" class="input-signUp" placeholder="First name" required>
-                                <input type="text" class="input-signUp" placeholder="Last name" required>
+                                <input type="text" class="input-signUp" placeholder="First name" id="register-firstname" required>
+                                <input type="text" class="input-signUp" placeholder="Last name" id="register-lastname" required>
                             </div>
 
                             <div class="d-flex">
@@ -44,85 +43,78 @@
                                 <p id="parg-genderSignUp">Gender</p>
                             </div>
                             <div class="form-fields d-flex ">
-                                <input type="date" class="input-signUp me-3" required>
-                                <select class="form-select w-25" aria-label="Default select example" required>
+                                <input type="date" class="input-signUp me-3" id="register-birthdate" required>
+                                <select class="form-select w-25" id="register-gender" required>
                                     <option value="" disabled selected hidden>Gender</option>
-                                    <option value="1">Male</option>
-                                    <option value="2">Female</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
                                 </select>
                             </div>
 
                             <div class="form-fields">
-                                <input type="text" class="input-signUp" placeholder="Username" required />
-                                <input type="password" class="input-signUp" placeholder="Password" required />
+                                <input type="text" class="input-signUp" placeholder="Username" id="register-username" required />
+                                <input type="password" class="input-signUp" placeholder="Password" id="register-password" required />
                             </div>
-
 
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary rounded-pill">Sign up</button>
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                    </div>
+                    <div class="modal-footer"></div>
                 </div>
             </div>
         </div>
 
-
-
-
-
-        <!-- כפתור התחברות-->
-        <button type="button" class="btn btn-light rounded-pill  loginPageBtn d-block w-38 tallBtnSign "
+        <!-- כפתור התחברות -->
+        <button type="button" class="btn btn-light rounded-pill loginPageBtn d-block w-38 tallBtnSign"
             data-bs-toggle="modal" data-bs-target="#signInModal">
             Sign in
         </button>
 
-        <!--מודל התחברות -->
+        <!-- מודל התחברות -->
         <div class="modal fade" id="signInModal" tabindex="-1" aria-labelledby="signInModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-4" id="signInModal">Sign in <br> <span id="parg-signIn">Sign in to
+                        <h1 class="modal-title fs-4" id="signInModalLabel">Sign in <br> <span id="parg-signIn">Sign in to
                                 JewUnity Social with your username and password.</span></h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form action="">
+                        <form id="login-form">
                             <div class="form-fields">
-                                <input type="text" class="input-signIn" placeholder="Username" required><br>
+                                <input type="text" class="input-signIn" placeholder="Username" id="login-username" required><br>
                             </div>
 
                             <div class="form-fields">
-                                <input type="password" class="input-signIn" placeholder="Password" required>
+                                <input type="password" class="input-signIn" placeholder="Password" id="login-password" required>
                             </div>
-
 
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary rounded-pill">Sign in</button>
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                    </div>
+                    <div class="modal-footer"></div>
                 </div>
             </div>
         </div>
+
         <p id="pargTermsOfService">By continuing, you agree to our <a href="" class="linkTermsOfService">Terms of
                 Service</a> and <a href="" class="linkTermsOfService">Privacy Policy</a>.</p>
 
         <div class="d-flex gap-3">
-            <button class="btn btn-light rounded-pill  w-10 BtnDownload loginPageBtn "> Download on the <span
+            <button class="btn btn-light rounded-pill w-10 BtnDownload loginPageBtn"> Download on the <span
                     class="downloadName">Play Store <i class="bi bi-google-play"></i></span></button>
-            <button class="btn btn-light rounded-pill w-10 BtnDownload  loginPageBtn ">Download on the <span
+            <button class="btn btn-light rounded-pill w-10 BtnDownload loginPageBtn">Download on the <span
                     class="downloadName">App Store <i class="bi bi-apple"></i></span></button>
         </div>
 
         <div class="footerLinks d-flex gap-3 ">
             <a href="" class="linkFooter">GDPR</a>
             <a href="" class="linkFooter">CCPA Privacy Policy</a>
-            <a href=""class="linkFooter">Advertise</a>
+            <a href="" class="linkFooter">Advertise</a>
             <a href="" class="linkFooter">Help Center</a>
         </div>
 
@@ -134,6 +126,5 @@
         integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
         crossorigin="anonymous"></script>
 </body>
-
 
 </html>
