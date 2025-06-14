@@ -1,7 +1,7 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');  
-const JWT_SECRET = 'mySecretKey123';  
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = 'mySecretKey123';
 
 // רישום משתמש
 const registerUser = async (req, res) => {
@@ -11,10 +11,30 @@ const registerUser = async (req, res) => {
     return res.status(400).json({ error: 'All fields are required' });
   }
 
+
+
   try {
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(409).json({ error: 'Username already exists' });
+    }
+
+    // ולידציה 1: אורך סיסמה מינימלי
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+    }
+
+    // ולידציה 2: פורמט username (אותיות, מספרים וקו תחתון בלבד)
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(username)) {
+      return res.status(400).json({ error: 'Username can only contain letters, numbers and underscores' });
+    }
+
+    // ולידציה 3: תאריך לידה אינו בעתיד
+    const birthDateObj = new Date(birthDate);
+    const today = new Date();
+    if (birthDateObj > today) {
+      return res.status(400).json({ error: 'Birth date cannot be in the future' });
     }
 
     const saltRounds = 10;
@@ -22,7 +42,7 @@ const registerUser = async (req, res) => {
 
     const newUser = new User({
       username,
-      password: hashedPassword,      
+      password: hashedPassword,
       gender,
       birthDate,
       firstName,
@@ -58,7 +78,7 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
- 
+
     const token = jwt.sign(
       { userId: user._id, username: user.username },
       JWT_SECRET,
