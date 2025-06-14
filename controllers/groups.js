@@ -3,6 +3,11 @@ const User = require('../models/user');
 const mongoose = require('mongoose');
 
 
+
+
+
+
+
 const createGroup = async (req, res) => {
   const { name, description } = req.body;
 
@@ -17,11 +22,13 @@ const createGroup = async (req, res) => {
       return res.status(409).json({ error: 'Group name already exists' });
     }
 
-    const newGroup = new Group({
-      name,
-      description,
-      members: [req.user.userId] // היוצר של הקבוצה נכנס אוטומטית כחבר ראשון
-    });
+   const newGroup = new Group({
+  name,
+  description,
+  owner: req.user.userId,
+  members: [{ userId: req.user.userId, status: 'active' }]
+});
+
 
     await newGroup.save();
 
@@ -33,17 +40,18 @@ const createGroup = async (req, res) => {
 };
 
 const addMemberToGroup = async (req, res) => {
-  const { groupId, userId, status = 'active' } = req.body;  // ברירת מחדל 'active'
+  const { groupId, userId, status = 'active' } = req.body;
 
   try {
     const group = await Group.findById(groupId);
-
     if (!group) {
       return res.status(404).json({ error: 'Group not found' });
     }
 
-    // אם המשתמש כבר חבר בקבוצה, לא נוסיף אותו שוב
-    const existingMember = group.members.find(member => member.userId.toString() === userId);
+    const existingMember = group.members.find(
+      member => member.userId.toString() === userId
+    );
+
     if (existingMember) {
       return res.status(400).json({ error: 'User is already a member' });
     }
@@ -171,6 +179,10 @@ const updateGroup = async (req, res) => {
       return res.status(404).json({ error: 'Group not found' });
     }
 
+    if (group.owner.toString() !== req.user.userId) {
+      return res.status(403).json({ error: 'You are not authorized to update this group' });
+    }
+
     if (name) group.name = name;
     if (description) group.description = description;
 
@@ -183,15 +195,22 @@ const updateGroup = async (req, res) => {
   }
 };
 
+
 const deleteGroup = async (req, res) => {
   const { groupId } = req.params;
 
   try {
-    const group = await Group.findByIdAndDelete(groupId);
+    const group = await Group.findById(groupId);
 
     if (!group) {
       return res.status(404).json({ error: 'Group not found' });
     }
+
+    if (group.owner.toString() !== req.user.userId) {
+      return res.status(403).json({ error: 'You are not authorized to delete this group' });
+    }
+
+    await Group.findByIdAndDelete(groupId);
 
     res.status(200).json({ message: 'Group deleted successfully' });
   } catch (err) {
@@ -199,6 +218,7 @@ const deleteGroup = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 
 

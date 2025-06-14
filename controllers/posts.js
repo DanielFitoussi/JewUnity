@@ -1,4 +1,7 @@
 const Post = require('../models/posts');
+const mongoose = require('mongoose');
+const Group = require('../models/groups');
+
 
 // שליפת כל הפוסטים
 const getPosts = async (req, res) => {
@@ -129,6 +132,34 @@ const getPostsCountPerUser = async (req, res) => {
   }
 };
 
+const getMyPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({ author: req.user.userId }).sort({ createdAt: -1 });
+    res.status(200).json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+const getGroupFeed = async (req, res) => {
+  try {
+    const userObjectId = new mongoose.Types.ObjectId(req.user.userId);
+
+    const groups = await Group.find({ "members.userId": userObjectId });
+
+    const groupIds = groups.map(group => group._id);
+
+    const posts = await Post.find({ groupId: { $in: groupIds } }).sort({ createdAt: -1 });
+
+    res.status(200).json(posts);
+  } catch (err) {
+    console.error('Error in getGroupFeed:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
 
 
 module.exports = {
@@ -138,5 +169,7 @@ module.exports = {
    updatePost,
   clearPosts,
   getPostsCountPerGroup,
-  getPostsCountPerUser
+  getPostsCountPerUser,
+   getMyPosts,
+   getGroupFeed
 };
