@@ -61,8 +61,6 @@ async function loginUser(event) {
 
     // אחסון הטוקן ב-localStorage
     localStorage.setItem('token', data.token);
-
-    alert('User logged in successfully!');
     window.location.href = 'feed.html'; // לדוגמה: ננתב לדף הפיד (בהמשך נבנה אותו)
   } catch (err) {
     console.error(err);
