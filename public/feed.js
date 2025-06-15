@@ -1,4 +1,14 @@
+
 document.addEventListener('DOMContentLoaded', () => {
+   // בדיקה אם יש טוקן
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('You must be logged in to access the feed');
+    window.location.href = 'login.html';
+    return;
+  }
+
+
   const postForm = document.getElementById('postForm');
   const postsContainer = document.getElementById('postsContainer');
 
