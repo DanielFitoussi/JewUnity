@@ -14,34 +14,31 @@ const getPosts = async (req, res) => {
   }
 };
 
-// יצירת פוסט חדש
+// יצירת פוסט חדש עם populate
 const createPost = async (req, res) => {
-  const { content, mediaUrl, mediaType } = req.body;
-
-   console.log('Request Body:', req.body);  // 🚀 נעקוב אחרי מה שנשלח
-
-  if (!content ) {
-    return res.status(400).json({ error: 'Missing content ' });
-  }
-
   try {
+    const { content, mediaUrl, mediaType } = req.body;
+    const author = req.user.userId; // לוקחים את מזהה המשתמש מתוך הטוקן
+
     const newPost = new Post({
       content,
-      author: req.user.userId,
+      author,
       mediaUrl: mediaUrl || null,
       mediaType: mediaType || 'text'
     });
 
-     console.log('New Post to Save:', newPost);  // 🚀 נראה מה נוצר
-
     await newPost.save();
-    res.status(201).json(newPost);
+
+    // שליפה מחדש עם populate לצורך החזרת author עם username
+    const populatedPost = await Post.findById(newPost._id).populate('author', 'username firstName lastName');
+
+    res.status(201).json(populatedPost);
   } catch (err) {
-    console.error('Error while creating post:', err);  // 🚀 נדפיס את השגיאה המלאה
-    // console.error(err);
+    console.error('Error while creating post:', err);
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 const clearPosts = async (req, res) => {
   try {

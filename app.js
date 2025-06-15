@@ -17,6 +17,7 @@ connectDB ();
 
 app.use(cors());
 app.use(express.json())
+app.use(express.static('public'));
 app.use('/api/groups', groupRoutes);
 app.use('/', testRoutes)
 app.use('/api/users', userRoutes)
