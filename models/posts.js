@@ -1,7 +1,14 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const Schema = mongoose.Schema
+// קודם מגדירים את סכמת התגובה:
+const commentSchema = new mongoose.Schema({
+  content: { type: String, required: true },
+  author: { type: Schema.Types.ObjectId, ref: 'User' },
+  createdAt: { type: Date, default: Date.now }
+});
 
+// סכמת הפוסט:
 const PostSchema = new mongoose.Schema({
   content: {
     type: String,
@@ -24,9 +31,10 @@ const PostSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  likedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  comments: [commentSchema]  // כאן ההגדרה התקינה עכשיו
 });
 
 const Post = mongoose.model('Post', PostSchema);
-
 module.exports = Post;

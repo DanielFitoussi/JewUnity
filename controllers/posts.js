@@ -156,6 +156,63 @@ const getGroupFeed = async (req, res) => {
   }
 };
 
+const likePost = async (req, res) => {
+  const postId = req.params.id;
+  const userId = req.user.userId;
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+
+    const hasLiked = post.likedBy.includes(userId);
+
+    if (hasLiked) {
+      // המשתמש כבר עשה לייק — נוריד לייק
+      post.likedBy.pull(userId);
+    } else {
+      // מוסיף לייק
+      post.likedBy.push(userId);
+    }
+
+    await post.save();
+
+    res.status(200).json({
+      likes: post.likedBy.length,
+      likedBy: post.likedBy
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+const addComment = async (req, res) => {
+  const postId = req.params.id;
+  const { content } = req.body;
+  const userId = req.user.userId;
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+
+    post.comments.push({
+      content,
+      author: userId
+    });
+
+    await post.save();
+
+    const populatedPost = await Post.findById(postId).populate('comments.author', 'username');
+    res.status(201).json(populatedPost.comments);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+
 
 
 
@@ -168,5 +225,7 @@ module.exports = {
   getPostsCountPerGroup,
   getPostsCountPerUser,
    getMyPosts,
-   getGroupFeed
+   getGroupFeed,
+    likePost,
+    addComment
 };
