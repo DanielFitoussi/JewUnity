@@ -20,6 +20,9 @@ router.put('/:groupId', authenticateToken, groupController.updateGroup);
 // מחיקת קבוצה
 router.delete('/:groupId', authenticateToken, groupController.deleteGroup);
 
+router.get('/', authenticateToken, groupController.getAllGroups);
+
+
 
 
 

@@ -17,19 +17,19 @@ const getPosts = async (req, res) => {
 // יצירת פוסט חדש עם populate
 const createPost = async (req, res) => {
   try {
-    const { content, mediaUrl, mediaType } = req.body;
-    const author = req.user.userId; // לוקחים את מזהה המשתמש מתוך הטוקן
+    const { content, mediaUrl, mediaType, groupId } = req.body;
+    const author = req.user.userId;
 
     const newPost = new Post({
       content,
       author,
       mediaUrl: mediaUrl || null,
-      mediaType: mediaType || 'text'
+      mediaType: mediaType || 'text',
+      groupId // ✅ שומר את groupId!
     });
 
     await newPost.save();
 
-    // שליפה מחדש עם populate לצורך החזרת author עם username
     const populatedPost = await Post.findById(newPost._id).populate('author', 'username firstName lastName');
 
     res.status(201).json(populatedPost);
@@ -38,6 +38,7 @@ const createPost = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 
 const clearPosts = async (req, res) => {
@@ -107,15 +108,39 @@ const updatePost = async (req, res) => {
 const getPostsCountPerGroup = async (req, res) => {
   try {
     const stats = await Post.aggregate([
-      { $group: { _id: "$groupId", postsCount: { $sum: 1 } } }
+      {
+        $group: {
+          _id: "$groupId",
+          postsCount: { $sum: 1 }
+        }
+      },
+      {
+        $lookup: {
+          from: "groups",
+          localField: "_id",
+          foreignField: "_id",
+          as: "group"
+        }
+      },
+      {
+        $unwind: "$group"
+      },
+      {
+        $project: {
+          _id: 0,
+          groupName: "$group.name",
+          postsCount: 1
+        }
+      }
     ]);
 
     res.status(200).json(stats);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: "Server error" });
   }
 };
+
 const getPostsCountPerUser = async (req, res) => {
   try {
     const stats = await Post.aggregate([

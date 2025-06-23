@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Feed</title>
@@ -27,25 +28,35 @@
       </form>
     </div>
 
-   <div class="position-absolute top-0 end-0 m-3">
-  <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
-      סינון פוסטים
-    </button>
-    <ul class="dropdown-menu">
-      <li><a class="dropdown-item filter-option" data-filter="all" href="#">הצג הכל</a></li>
-      <li><a class="dropdown-item filter-option" data-filter="text" href="#">טקסט בלבד</a></li>
-      <li><a class="dropdown-item filter-option" data-filter="image" href="#">תמונות בלבד</a></li>
-      <li><a class="dropdown-item filter-option" data-filter="video" href="#">וידאו בלבד</a></li>
-    </ul>
+    <!-- כפתור סינון -->
+    <div class="position-absolute top-0 end-0 m-3">
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
+          סינון פוסטים
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item filter-option" data-filter="all" href="#">הצג הכל</a></li>
+          <li><a class="dropdown-item filter-option" data-filter="text" href="#">טקסט בלבד</a></li>
+          <li><a class="dropdown-item filter-option" data-filter="image" href="#">תמונות בלבד</a></li>
+          <li><a class="dropdown-item filter-option" data-filter="video" href="#">וידאו בלבד</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- אזור הפוסטים -->
+    <div id="postsContainer"></div>
+  </div>
+
+  <!-- גרף -->
+<div class="container mt-5">
+  <div class="chart-wrapper">
+    <h5 class="chart-title">פוסטים לפי קבוצה</h5>
+    <svg id="postsPerGroupChart" width="600" height="400"></svg>
   </div>
 </div>
 
 
 
-    <!-- אזור הפוסטים -->
-    <div id="postsContainer"></div>
-  </div>
 
   <script src="feed.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"

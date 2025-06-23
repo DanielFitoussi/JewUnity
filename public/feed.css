@@ -121,6 +121,41 @@ button[type="submit"] {
   color: #333;
 }
 
+#postsPerGroupChart {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+
+.chart-label {
+  font-size: 12px;
+  fill: #333;
+  text-anchor: middle;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+
+.chart-wrapper {
+  width: 600px;
+  margin: 0 auto;
+}
+
+.chart-title {
+  text-align: right;
+  margin-bottom: 0.5rem;
+}
+
+
+
+
+
 
 
 

@@ -219,7 +219,15 @@ const deleteGroup = async (req, res) => {
   }
 };
 
-
+const getAllGroups = async (req, res) => {
+  try {
+    const groups = await Group.find();
+    res.status(200).json(groups);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch groups' });
+  }
+};
 
 
 
@@ -232,5 +240,6 @@ module.exports = {
   getGroupStats,
   getAdvancedGroupStats,
   deleteGroup,
-  updateGroup
+  updateGroup,
+  getAllGroups
 };

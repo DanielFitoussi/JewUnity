@@ -1,10 +1,14 @@
+let token = null;
+
 document.addEventListener('DOMContentLoaded', () => {
-  const token = localStorage.getItem('token');
+  token = localStorage.getItem('token');
   if (!token) {
     alert('You must be logged in to access the feed');
     window.location.href = 'login.html';
     return;
   }
+
+  renderPostsPerGroupChart(token);
 
   const API_BASE_URL = 'http://localhost:3005/api/posts';
   const postForm = document.getElementById('postForm');
@@ -24,6 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Failed to load posts:', err);
     }
   }
+
+
 
   function renderPost(post) {
     const postElement = document.createElement('div');
@@ -203,3 +209,70 @@ function parseJwt(token) {
 
   return JSON.parse(jsonPayload);
 }
+
+
+async function renderPostsPerGroupChart(token) {
+  try {
+    const response = await fetch('http://localhost:3005/api/posts/stats-per-group', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+
+    console.log("📊 נתוני הגרף:", data);
+
+
+    const svg = d3.select("#postsPerGroupChart");
+    const width = +svg.attr("width");
+    const height = +svg.attr("height");
+    svg.selectAll("*").remove(); // ניקוי קודם
+
+    const margin = { top: 20, right: 30, bottom: 50, left: 50 };
+    const chartWidth = width - margin.left - margin.right;
+    const chartHeight = height - margin.top - margin.bottom;
+
+    const x = d3.scaleBand()
+      .domain(data.map(d => d.groupName))
+      .range([0, chartWidth])
+      .padding(0.2);
+
+    const y = d3.scaleLinear()
+      .domain([0, d3.max(data, d => d.postsCount)])
+      .nice()
+      .range([chartHeight, 0]);
+
+    const chart = svg.append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    chart.append("g").call(d3.axisLeft(y));
+
+    chart.append("g")
+      .attr("transform", `translate(0,${chartHeight})`)
+      .call(d3.axisBottom(x))
+      .selectAll("text")
+      .attr("transform", "rotate(-30)")
+      .style("text-anchor", "end");
+
+    chart.selectAll("rect")
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("x", d => x(d.groupName))
+      .attr("y", d => y(d.postsCount))
+      .attr("width", x.bandwidth())
+      .attr("height", d => chartHeight - y(d.postsCount))
+      .attr("fill", (d, i) => d3.schemeCategory10[i % 10]);
+
+     chart.selectAll("text.labels")
+  .data(data)
+  .enter()
+  .append("text")
+  .attr("class", "chart-label")
+  .attr("x", d => x(d.groupName) + x.bandwidth() / 2)
+  .attr("y", d => y(d.postsCount) - 5)
+  .text(d => d.postsCount);
+
+  } catch (err) {
+    console.error("Failed to load chart:", err);
+  }
+}
+

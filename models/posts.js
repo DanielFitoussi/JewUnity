@@ -28,13 +28,18 @@ const PostSchema = new mongoose.Schema({
     enum: ['text', 'image', 'video'],
     default: 'text'
   },
+  groupId: {  // ✅ הוספה חדשה
+    type: Schema.Types.ObjectId,
+    ref: 'Group'
+  },
   createdAt: {
     type: Date,
     default: Date.now
   },
   likedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  comments: [commentSchema]  // כאן ההגדרה התקינה עכשיו
+  comments: [commentSchema]
 });
+
 
 const Post = mongoose.model('Post', PostSchema);
 module.exports = Post;
