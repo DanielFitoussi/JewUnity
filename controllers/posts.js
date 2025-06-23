@@ -236,6 +236,32 @@ const addComment = async (req, res) => {
   }
 };
 
+const getPostCountsByMediaType = async (req, res) => {
+  try {
+    const stats = await Post.aggregate([
+      {
+        $group: {
+          _id: "$mediaType",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          mediaType: "$_id",
+          count: 1
+        }
+      }
+    ]);
+
+    res.status(200).json(stats);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+
 
 
 
@@ -252,5 +278,6 @@ module.exports = {
    getMyPosts,
    getGroupFeed,
     likePost,
-    addComment
+    addComment,
+    getPostCountsByMediaType
 };

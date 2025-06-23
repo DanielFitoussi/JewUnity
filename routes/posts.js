@@ -17,6 +17,9 @@ router.get('/stats-per-user', authenticateToken, postsController.getPostsCountPe
 router.get('/my-posts', authenticateToken, postsController.getMyPosts);
 router.get('/group-feed', authenticateToken, postsController.getGroupFeed);
 router.post('/:id/comments', authenticateToken, addComment);
+router.get('/stats-media-type', authenticateToken, postsController.getPostCountsByMediaType);
+
+
 
 
 

@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderPostsPerGroupChart(token);
 
+  renderMediaTypeChart(token);
+
+
   const API_BASE_URL = 'http://localhost:3005/api/posts';
   const postForm = document.getElementById('postForm');
   const postsContainer = document.getElementById('postsContainer');
@@ -275,4 +278,53 @@ async function renderPostsPerGroupChart(token) {
     console.error("Failed to load chart:", err);
   }
 }
+
+async function renderMediaTypeChart(token) {
+  try {
+    const response = await fetch('http://localhost:3005/api/posts/stats-media-type', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    const data = await response.json();
+
+    const svg = d3.select("#postMediaTypeChart")
+      .attr("width", 600)
+      .attr("height", 400);
+
+    const width = +svg.attr("width");
+    const height = +svg.attr("height");
+
+    svg.selectAll("*").remove(); // ניקוי קודם
+
+    const radius = Math.min(width, height) / 2;
+    const chart = svg.append("g")
+      .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+    const color = d3.scaleOrdinal()
+      .domain(data.map(d => d.mediaType))
+      .range(d3.schemeSet2);
+
+    const pie = d3.pie().value(d => d.count);
+    const arc = d3.arc().innerRadius(0).outerRadius(radius);
+
+    chart.selectAll("path")
+      .data(pie(data))
+      .enter()
+      .append("path")
+      .attr("d", arc)
+      .attr("class", d => `pie-slice ${d.data.mediaType}`);
+
+    chart.selectAll("text")
+      .data(pie(data))
+      .enter()
+      .append("text")
+      .attr("transform", d => `translate(${arc.centroid(d)})`)
+      .attr("class", "pie-label")
+      .text(d => `${d.data.mediaType}: ${d.data.count}`);
+
+  } catch (err) {
+    console.error("Failed to load media type chart:", err);
+  }
+}
+
 

@@ -152,6 +152,69 @@ button[type="submit"] {
   margin-bottom: 0.5rem;
 }
 
+/* עטיפת גרף */
+.chart-container {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+/* כותרת של הגרף */
+.chart-title {
+  text-align: right;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+/* גודל ברירת מחדל של SVG */
+#postMediaTypeChart {
+  width: 600px;
+  height: 400px;
+  margin: 0 auto;
+  display: block;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+
+/* צבעים לפי סוג */
+.pie-slice.text {
+  fill: #1da1f2;
+  stroke: #fff;
+  stroke-width: 2px;
+}
+
+.pie-slice.image {
+  fill: #ff9900;
+  stroke: #fff;
+  stroke-width: 2px;
+}
+
+.pie-slice.video {
+  fill: #28a745;
+  stroke: #fff;
+  stroke-width: 2px;
+}
+
+/* תוויות */
+.pie-label {
+  font-size: 14px;
+  fill: #000;
+  text-anchor: middle;
+}
+
+.chart-svg {
+  width: 600px;
+  height: 400px;
+  display: block;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
 
 
 
