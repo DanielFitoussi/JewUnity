@@ -62,6 +62,19 @@ document.addEventListener('DOMContentLoaded', () => {
     textElement.textContent = post.content;
     cardBody.appendChild(textElement);
 
+    if (post.mediaUrl && post.mediaType !== 'text') {
+  const mediaElement = document.createElement(post.mediaType === 'image' ? 'img' : 'video');
+  mediaElement.src = post.mediaUrl;
+  mediaElement.classList.add('post-media');
+
+  if (post.mediaType === 'video') {
+    mediaElement.controls = true;
+  }
+
+  cardBody.appendChild(mediaElement);
+}
+
+
     const actionsWrapper = document.createElement('div');
     actionsWrapper.classList.add('d-flex', 'align-items-center', 'gap-3', 'mt-2');
 
@@ -174,22 +187,33 @@ document.addEventListener('DOMContentLoaded', () => {
     commentSection.appendChild(commentList);
     cardBody.appendChild(commentSection);
     postElement.appendChild(cardBody);
+    postElement.setAttribute('data-type', post.mediaType || 'text');
     postsContainer.prepend(postElement);
   }
 
   postForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+
     const content = document.getElementById('postContent').value;
-    const newPost = { content };
+    const fileInput = document.getElementById('postImage');
+    const file = fileInput.files[0];
+
+    const formData = new FormData();
+    formData.append('content', content);
+    if (file) {
+      formData.append('media', file);
+      formData.append('mediaType', file.type.startsWith('image') ? 'image' :
+        file.type.startsWith('video') ? 'video' : 'text');
+    }
 
     try {
       const response = await fetch(API_BASE_URL, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(newPost)
+        body: formData
       });
 
       const savedPost = await response.json();
@@ -199,6 +223,15 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Failed to create post:', err);
     }
   });
+
+  document.querySelectorAll('.filter-option').forEach(option => {
+  option.addEventListener('click', (e) => {
+    e.preventDefault();
+    const filter = option.getAttribute('data-filter');
+    filterPosts(filter);
+  });
+});
+
 
   loadPosts();
 });
@@ -265,14 +298,14 @@ async function renderPostsPerGroupChart(token) {
       .attr("height", d => chartHeight - y(d.postsCount))
       .attr("fill", (d, i) => d3.schemeCategory10[i % 10]);
 
-     chart.selectAll("text.labels")
-  .data(data)
-  .enter()
-  .append("text")
-  .attr("class", "chart-label")
-  .attr("x", d => x(d.groupName) + x.bandwidth() / 2)
-  .attr("y", d => y(d.postsCount) - 5)
-  .text(d => d.postsCount);
+    chart.selectAll("text.labels")
+      .data(data)
+      .enter()
+      .append("text")
+      .attr("class", "chart-label")
+      .attr("x", d => x(d.groupName) + x.bandwidth() / 2)
+      .attr("y", d => y(d.postsCount) - 5)
+      .text(d => d.postsCount);
 
   } catch (err) {
     console.error("Failed to load chart:", err);
@@ -326,5 +359,20 @@ async function renderMediaTypeChart(token) {
     console.error("Failed to load media type chart:", err);
   }
 }
+
+function filterPosts(type) {
+  const posts = document.querySelectorAll('#postsContainer .card');
+
+  posts.forEach(post => {
+    const mediaType = post.getAttribute('data-type') || 'text';
+
+    if (type === 'all' || mediaType === type) {
+      post.style.display = '';
+    } else {
+      post.style.display = 'none';
+    }
+  });
+}
+
 
 

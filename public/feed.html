@@ -17,12 +17,12 @@
   <div class="container mt-4">
     <!-- טופס יצירת פוסט -->
     <div class="card p-3 mb-4">
-      <form id="postForm">
+      <form id="postForm" enctype="multipart/form-data">
         <div class="mb-3">
           <textarea id="postContent" class="form-control" placeholder="What's on your mind?" rows="3" required></textarea>
         </div>
         <div class="mb-3">
-          <input type="file" id="postImage" class="form-control" accept="image/*,video/*">
+          <input type="file" id="postImage" name="media" class="form-control" accept="image/*,video/*">
         </div>
         <button type="submit" class="btn btn-primary">Post</button>
       </form>
@@ -48,25 +48,19 @@
   </div>
 
   <!-- גרף -->
-<div class="container mt-5">
-  <div class="chart-wrapper">
-    <h5 class="chart-title">פוסטים לפי קבוצה</h5>
-    <svg id="postsPerGroupChart" width="600" height="400"></svg>
+  <div class="container mt-5">
+    <div class="chart-wrapper">
+      <h5 class="chart-title">פוסטים לפי קבוצה</h5>
+      <svg id="postsPerGroupChart" width="600" height="400"></svg>
+    </div>
   </div>
-</div>
 
-
-
-
-<div class="container chart-container">
-  <div class="chart-wrapper">
-    <h5 class="chart-title">סוגי הפוסטים במערכת</h5>
-    <svg id="postMediaTypeChart" class="chart-svg"></svg>
+  <div class="container chart-container">
+    <div class="chart-wrapper">
+      <h5 class="chart-title">סוגי הפוסטים במערכת</h5>
+      <svg id="postMediaTypeChart" class="chart-svg"></svg>
+    </div>
   </div>
-</div>
-
-
-
 
   <script src="feed.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"

@@ -17,27 +17,38 @@ const getPosts = async (req, res) => {
 // יצירת פוסט חדש עם populate
 const createPost = async (req, res) => {
   try {
-    const { content, mediaUrl, mediaType, groupId } = req.body;
+    const { content } = req.body;
     const author = req.user.userId;
+
+    let mediaUrl = null;
+    let mediaType = 'text';
+
+    if (req.file) {
+      mediaUrl = `/uploads/${req.file.filename}`;
+      if (req.file.mimetype.startsWith('image/')) {
+        mediaType = 'image';
+      } else if (req.file.mimetype.startsWith('video/')) {
+        mediaType = 'video';
+      }
+    }
 
     const newPost = new Post({
       content,
       author,
-      mediaUrl: mediaUrl || null,
-      mediaType: mediaType || 'text',
-      groupId // ✅ שומר את groupId!
+      mediaUrl,
+      mediaType
     });
 
     await newPost.save();
-
     const populatedPost = await Post.findById(newPost._id).populate('author', 'username firstName lastName');
-
     res.status(201).json(populatedPost);
+
   } catch (err) {
     console.error('Error while creating post:', err);
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 
 

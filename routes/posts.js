@@ -4,11 +4,12 @@ const postsController = require('../controllers/posts')
 const authenticateToken = require('../middleware/auth')
 const { likePost } = require('../controllers/posts');
 const { addComment } = require('../controllers/posts');
+const upload = require('../middleware/upload');
 
 
 router.patch('/:id/like', authenticateToken, likePost);
 router.get('/', postsController.getPosts);
-router.post('/', authenticateToken, postsController.createPost);
+router.post('/', authenticateToken, upload.single('media'), postsController.createPost);
 router.delete('/clear', authenticateToken, postsController.clearPosts);
 router.delete('/:id', authenticateToken, postsController.deletePost);
 router.put('/:id', authenticateToken, postsController.updatePost);
