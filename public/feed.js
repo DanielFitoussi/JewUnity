@@ -637,6 +637,70 @@ async function loadGroups() {
   }
 }
 
+
+document.getElementById('groupSearchInput').addEventListener('input', async function () {
+  const query = this.value.trim();
+
+  if (query === '') {
+    loadGroups(); // טען את כל הקבוצות מחדש אם אין חיפוש
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://localhost:3005/api/groups/search?query=${encodeURIComponent(query)}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    const groups = await response.json();
+    const listContainer = document.getElementById('groupList');
+    listContainer.innerHTML = '';
+
+    const userId = parseJwt(token).userId;
+
+    groups.forEach(group => {
+      const li = document.createElement('li');
+      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+
+      const text = document.createElement('span');
+      text.textContent = `${group.name} - ${group.description || 'ללא תיאור'}`;
+      li.appendChild(text);
+
+      const actions = document.createElement('div');
+
+      if (group.owner === userId) {
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'ערוך';
+        editBtn.classList.add('btn', 'btn-sm', 'btn-warning', 'ms-2');
+        editBtn.addEventListener('click', () => showEditGroupForm(group));
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'מחק';
+        deleteBtn.classList.add('btn', 'btn-sm', 'btn-danger');
+        deleteBtn.addEventListener('click', () => deleteGroup(group._id));
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+      } else {
+        const isMember = group.members.some(m => m.userId === userId);
+        if (!isMember) {
+          const joinBtn = document.createElement('button');
+          joinBtn.textContent = 'הצטרף';
+          joinBtn.classList.add('btn', 'btn-sm', 'btn-outline-primary');
+          joinBtn.addEventListener('click', () => joinGroup(group._id));
+          actions.appendChild(joinBtn);
+        }
+      }
+
+      li.appendChild(actions);
+      listContainer.appendChild(li);
+    });
+
+  } catch (err) {
+    console.error('❌ שגיאה בחיפוש קבוצות:', err);
+  }
+});
+
+
 async function deleteGroup(groupId) {
   if (!confirm('האם אתה בטוח שברצונך למחוק את הקבוצה?')) return;
 

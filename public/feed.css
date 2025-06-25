@@ -241,6 +241,26 @@ button[type="submit"] {
   color: #003366;
 }
 
+#groupList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+#groupList li span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-grow: 1;
+}
+
+#groupList li div {
+  flex-shrink: 0;
+}
+
+
 
 
 
