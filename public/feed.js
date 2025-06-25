@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+    loadGroups();
+
   renderPostsPerGroupChart(token);
 
   renderMediaTypeChart(token);
@@ -590,36 +592,45 @@ async function loadGroups() {
     const listContainer = document.getElementById('groupList');
     listContainer.innerHTML = '';
 
-    groups.forEach(group => {
-      const li = document.createElement('li');
-      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+   groups.forEach(group => {
+  const li = document.createElement('li');
+  li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
 
-      const text = document.createElement('span');
-      text.textContent = `${group.name} - ${group.description || 'ללא תיאור'}`;
-      text.classList.add('group-item-text'); // ✅ הוספה חשובה
-      li.appendChild(text);
+  const text = document.createElement('span');
+  text.textContent = `${group.name} - ${group.description || 'ללא תיאור'}`;
+  li.appendChild(text);
 
-      const actions = document.createElement('div');
+  const actions = document.createElement('div');
 
-      // רק אם המשתמש הוא הבעלים
-      if (group.owner === userId) {
-        const editBtn = document.createElement('button');
-        editBtn.textContent = 'ערוך';
-        editBtn.classList.add('btn', 'btn-sm', 'btn-warning', 'ms-2');
-        editBtn.addEventListener('click', () => showEditGroupForm(group));
+  // אם המשתמש הוא הבעלים
+  if (group.owner === userId) {
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'ערוך';
+    editBtn.classList.add('btn', 'btn-sm', 'btn-warning', 'ms-2');
+    editBtn.addEventListener('click', () => showEditGroupForm(group));
 
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'מחק';
-        deleteBtn.classList.add('btn', 'btn-sm', 'btn-danger');
-        deleteBtn.addEventListener('click', () => deleteGroup(group._id));
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'מחק';
+    deleteBtn.classList.add('btn', 'btn-sm', 'btn-danger');
+    deleteBtn.addEventListener('click', () => deleteGroup(group._id));
 
-        actions.appendChild(editBtn);
-        actions.appendChild(deleteBtn);
-      }
+    actions.appendChild(editBtn);
+    actions.appendChild(deleteBtn);
+  } else {
+    // אם המשתמש לא הבעלים ולא חבר בקבוצה → מציע להצטרף
+    const isMember = group.members.some(m => m.userId === userId);
+    if (!isMember) {
+      const joinBtn = document.createElement('button');
+      joinBtn.textContent = 'הצטרף';
+      joinBtn.classList.add('btn', 'btn-sm', 'btn-outline-primary');
+      joinBtn.addEventListener('click', () => joinGroup(group._id));
+      actions.appendChild(joinBtn);
+    }
+  }
 
-      li.appendChild(actions);
-      listContainer.appendChild(li);
-    });
+  li.appendChild(actions);
+  listContainer.appendChild(li);
+});
 
   } catch (err) {
     console.error('❌ שגיאה בטעינת קבוצות:', err);
@@ -681,6 +692,30 @@ async function updateGroup(groupId, name, description) {
     }
   } catch (err) {
     console.error('❌ שגיאה בעדכון קבוצה:', err);
+  }
+}
+
+async function joinGroup(groupId) {
+  try {
+    const response = await fetch('http://localhost:3005/api/groups/add-member', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ groupId, userId: parseJwt(token).userId })
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      alert('✅ הצטרפת לקבוצה בהצלחה');
+      loadGroups();
+    } else {
+      alert(result.error || 'שגיאה בהצטרפות');
+    }
+  } catch (err) {
+    console.error('❌ שגיאה בהצטרפות לקבוצה:', err);
   }
 }
 

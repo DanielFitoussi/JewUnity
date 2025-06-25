@@ -228,6 +228,20 @@ button[type="submit"] {
 }
 
 
+.btn-join-group {
+  background-color: #e6f0ff;
+  border: 1px solid #3399ff;
+  color: #0056b3;
+  font-weight: 500;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-join-group:hover {
+  background-color: #cce0ff;
+  color: #003366;
+}
+
+
 
 
 
