@@ -6,7 +6,7 @@ const Group = require('../models/groups');
 // שליפת כל הפוסטים
 const getPosts = async (req, res) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 }).populate('author','username firstName lastName'); // שליפה לפי תאריך חדש קודם
+    const posts = await Post.find().sort({ createdAt: -1 }).populate('author', 'username firstName lastName'); // שליפה לפי תאריך חדש קודם
     res.json(posts);
   } catch (err) {
     console.error(err);
@@ -272,6 +272,61 @@ const getPostCountsByMediaType = async (req, res) => {
   }
 };
 
+const searchPosts = async (req, res) => {
+  const { query } = req.query;
+
+  if (!query) {
+    return res.status(400).json({ error: 'Missing search query' });
+  }
+
+  try {
+    const posts = await Post.aggregate([
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'author',
+          foreignField: '_id',
+          as: 'author'
+        }
+      },
+      {
+        $unwind: '$author'
+      },
+      {
+        $match: {
+          $or: [
+            { content: { $regex: query, $options: 'i' } },
+            { 'author.username': { $regex: query, $options: 'i' } }
+          ]
+        }
+      },
+      {
+        $project: {
+          content: 1,
+          createdAt: 1,
+          mediaUrl: 1,
+          mediaType: 1,
+          likedBy: 1,
+          comments: 1,
+          author: {
+            _id: '$author._id',
+            username: '$author.username'
+          }
+        }
+      },
+      {
+        $sort: { createdAt: -1 }
+      }
+    ]);
+    console.log("🔍 תוצאות חיפוש:", posts);
+    res.status(200).json(posts);
+  } catch (err) {
+    console.error('Error in searchPosts:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
 
 
 
@@ -281,14 +336,15 @@ const getPostCountsByMediaType = async (req, res) => {
 module.exports = {
   getPosts,
   createPost,
-   deletePost,
-   updatePost,
+  deletePost,
+  updatePost,
   clearPosts,
   getPostsCountPerGroup,
   getPostsCountPerUser,
-   getMyPosts,
-   getGroupFeed,
-    likePost,
-    addComment,
-    getPostCountsByMediaType
+  getMyPosts,
+  getGroupFeed,
+  likePost,
+  addComment,
+  getPostCountsByMediaType,
+  searchPosts
 };

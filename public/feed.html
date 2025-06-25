@@ -15,11 +15,16 @@
 <body>
 
   <div class="container mt-4">
+    <div class="mb-3">
+      <input type="text" id="searchInput" class="form-control" placeholder="חפש פוסטים לפי תוכן או שם משתמש...">
+    </div>
+
     <!-- טופס יצירת פוסט -->
     <div class="card p-3 mb-4">
       <form id="postForm" enctype="multipart/form-data">
         <div class="mb-3">
-          <textarea id="postContent" class="form-control" placeholder="What's on your mind?" rows="3" required></textarea>
+          <textarea id="postContent" class="form-control" placeholder="What's on your mind?" rows="3"
+            required></textarea>
         </div>
         <div class="mb-3">
           <input type="file" id="postImage" name="media" class="form-control" accept="image/*,video/*">
