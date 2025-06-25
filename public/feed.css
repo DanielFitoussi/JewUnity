@@ -220,6 +220,14 @@ button[type="submit"] {
   margin-inline-end: 4px;
 }
 
+.group-item-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
 
 
 

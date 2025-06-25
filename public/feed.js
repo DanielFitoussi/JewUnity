@@ -33,38 +33,38 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.getElementById('createGroupForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const name = document.getElementById('groupName').value.trim();
-  const description = document.getElementById('groupDescription').value.trim();
+    const name = document.getElementById('groupName').value.trim();
+    const description = document.getElementById('groupDescription').value.trim();
 
-  if (!name) return alert('יש למלא שם קבוצה');
+    if (!name) return alert('יש למלא שם קבוצה');
 
-  try {
-    const response = await fetch('http://localhost:3005/api/groups', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ name, description })
-    });
+    try {
+      const response = await fetch('http://localhost:3005/api/groups', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, description })
+      });
 
-    const result = await response.json();
+      const result = await response.json();
 
-    if (!response.ok) {
-      return alert(result.error || 'שגיאה ביצירת קבוצה');
+      if (!response.ok) {
+        return alert(result.error || 'שגיאה ביצירת קבוצה');
+      }
+
+      alert('✅ הקבוצה נוצרה בהצלחה');
+      document.getElementById('createGroupForm').reset();
+      loadGroups(); // רענון הרשימה
+
+    } catch (err) {
+      console.error('שגיאה ביצירת קבוצה:', err);
+      alert('שגיאה בשרת');
     }
-
-    alert('✅ הקבוצה נוצרה בהצלחה');
-    document.getElementById('createGroupForm').reset();
-    loadGroups(); // רענון הרשימה
-
-  } catch (err) {
-    console.error('שגיאה ביצירת קבוצה:', err);
-    alert('שגיאה בשרת');
-  }
-});
+  });
 
 
 
@@ -226,46 +226,46 @@ function renderPost(post) {
   actionsWrapper.appendChild(likeCountSpan);
   actionsWrapper.appendChild(commentBtn);
   actionsWrapper.appendChild(commentCountSpan);
-if (post.author?._id === userId) {
-  const editBtn = document.createElement('button');
-  editBtn.textContent = 'ערוך';
-  editBtn.classList.add('btn', 'btn-sm', 'btn-outline-secondary');
+  if (post.author?._id === userId) {
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'ערוך';
+    editBtn.classList.add('btn', 'btn-sm', 'btn-outline-secondary');
 
-  editBtn.addEventListener('click', () => {
-    showEditForm(post, postElement);
-  });
+    editBtn.addEventListener('click', () => {
+      showEditForm(post, postElement);
+    });
 
-  const deleteBtn = document.createElement('button');
-  deleteBtn.textContent = 'מחק';
-  deleteBtn.classList.add('btn', 'btn-sm', 'btn-outline-danger');
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'מחק';
+    deleteBtn.classList.add('btn', 'btn-sm', 'btn-outline-danger');
 
-  deleteBtn.addEventListener('click', async () => {
-    const confirmed = confirm('האם אתה בטוח שברצונך למחוק את הפוסט?');
-    if (!confirmed) return;
+    deleteBtn.addEventListener('click', async () => {
+      const confirmed = confirm('האם אתה בטוח שברצונך למחוק את הפוסט?');
+      if (!confirmed) return;
 
-    try {
-      const response = await fetch(`http://localhost:3005/api/posts/${post._id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
+      try {
+        const response = await fetch(`http://localhost:3005/api/posts/${post._id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          postElement.remove();
+          console.log('פוסט נמחק בהצלחה');
+        } else {
+          const err = await response.json();
+          console.error('שגיאה במחיקה:', err);
         }
-      });
-
-      if (response.ok) {
-        postElement.remove();
-        console.log('פוסט נמחק בהצלחה');
-      } else {
-        const err = await response.json();
-        console.error('שגיאה במחיקה:', err);
+      } catch (err) {
+        console.error('שגיאה במחיקת הפוסט:', err);
       }
-    } catch (err) {
-      console.error('שגיאה במחיקת הפוסט:', err);
-    }
-  });
+    });
 
-  actionsWrapper.appendChild(editBtn);
-  actionsWrapper.appendChild(deleteBtn);
-}
+    actionsWrapper.appendChild(editBtn);
+    actionsWrapper.appendChild(deleteBtn);
+  }
 
 
   cardBody.appendChild(actionsWrapper);
@@ -361,7 +361,7 @@ function showEditForm(post, postElement) {
   formWrapper.appendChild(cancelBtn);
 
   oldTextElement.style.display = 'none';
-postElement.appendChild(formWrapper);
+  postElement.appendChild(formWrapper);
 
   saveBtn.addEventListener('click', async () => {
     const newContent = input.value.trim();
@@ -585,14 +585,39 @@ async function loadGroups() {
     });
 
     const groups = await response.json();
+    const userId = parseJwt(token).userId;
 
     const listContainer = document.getElementById('groupList');
     listContainer.innerHTML = '';
 
     groups.forEach(group => {
       const li = document.createElement('li');
-      li.classList.add('list-group-item');
-      li.textContent = `${group.name} - ${group.description || 'ללא תיאור'}`;
+      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+
+      const text = document.createElement('span');
+      text.textContent = `${group.name} - ${group.description || 'ללא תיאור'}`;
+      text.classList.add('group-item-text'); // ✅ הוספה חשובה
+      li.appendChild(text);
+
+      const actions = document.createElement('div');
+
+      // רק אם המשתמש הוא הבעלים
+      if (group.owner === userId) {
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'ערוך';
+        editBtn.classList.add('btn', 'btn-sm', 'btn-warning', 'ms-2');
+        editBtn.addEventListener('click', () => showEditGroupForm(group));
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'מחק';
+        deleteBtn.classList.add('btn', 'btn-sm', 'btn-danger');
+        deleteBtn.addEventListener('click', () => deleteGroup(group._id));
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+      }
+
+      li.appendChild(actions);
       listContainer.appendChild(li);
     });
 
@@ -600,6 +625,67 @@ async function loadGroups() {
     console.error('❌ שגיאה בטעינת קבוצות:', err);
   }
 }
+
+async function deleteGroup(groupId) {
+  if (!confirm('האם אתה בטוח שברצונך למחוק את הקבוצה?')) return;
+
+  try {
+    const response = await fetch(`http://localhost:3005/api/groups/${groupId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      alert('✅ הקבוצה נמחקה');
+      loadGroups();
+    } else {
+      alert(result.error || 'שגיאה במחיקה');
+    }
+  } catch (err) {
+    console.error('❌ שגיאה במחיקת קבוצה:', err);
+  }
+}
+
+function showEditGroupForm(group) {
+  const name = prompt('שם חדש לקבוצה:', group.name);
+  if (!name) return;
+
+  const description = prompt('תיאור חדש:', group.description || '');
+  if (description === null) return;
+
+  updateGroup(group._id, name, description);
+}
+
+async function updateGroup(groupId, name, description) {
+  try {
+    const response = await fetch(`http://localhost:3005/api/groups/${groupId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ name, description })
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      alert('✅ הקבוצה עודכנה בהצלחה');
+      loadGroups();
+    } else {
+      alert(result.error || 'שגיאה בעדכון');
+    }
+  } catch (err) {
+    console.error('❌ שגיאה בעדכון קבוצה:', err);
+  }
+}
+
+
+
 
 
 

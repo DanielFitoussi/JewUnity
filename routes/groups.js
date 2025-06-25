@@ -14,11 +14,15 @@ router.get('/search', authenticateToken, groupController.searchGroups);
 router.get('/:groupId/stats', authenticateToken, groupController.getGroupStats);
 // סטטיסטיקות מתקדמות לקבוצה
 router.get('/:groupId/advanced-stats', authenticateToken, groupController.getAdvancedGroupStats);
-// עדכון קבוצה
-router.put('/:groupId', authenticateToken, groupController.updateGroup);
+// // עדכון קבוצה
+// router.put('/:groupId', authenticateToken, groupController.updateGroup);
+
 
 // מחיקת קבוצה
 router.delete('/:groupId', authenticateToken, groupController.deleteGroup);
+
+router.patch('/:groupId', authenticateToken, groupController.updateGroup);
+
 
 router.get('/', authenticateToken, groupController.getAllGroups);
 
