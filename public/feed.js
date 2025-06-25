@@ -32,6 +32,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  document.getElementById('createGroupForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById('groupName').value.trim();
+  const description = document.getElementById('groupDescription').value.trim();
+
+  if (!name) return alert('יש למלא שם קבוצה');
+
+  try {
+    const response = await fetch('http://localhost:3005/api/groups', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ name, description })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return alert(result.error || 'שגיאה ביצירת קבוצה');
+    }
+
+    alert('✅ הקבוצה נוצרה בהצלחה');
+    document.getElementById('createGroupForm').reset();
+    loadGroups(); // רענון הרשימה
+
+  } catch (err) {
+    console.error('שגיאה ביצירת קבוצה:', err);
+    alert('שגיאה בשרת');
+  }
+});
+
+
 
 
   postForm.addEventListener('submit', async (e) => {
@@ -191,6 +226,48 @@ function renderPost(post) {
   actionsWrapper.appendChild(likeCountSpan);
   actionsWrapper.appendChild(commentBtn);
   actionsWrapper.appendChild(commentCountSpan);
+if (post.author?._id === userId) {
+  const editBtn = document.createElement('button');
+  editBtn.textContent = 'ערוך';
+  editBtn.classList.add('btn', 'btn-sm', 'btn-outline-secondary');
+
+  editBtn.addEventListener('click', () => {
+    showEditForm(post, postElement);
+  });
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'מחק';
+  deleteBtn.classList.add('btn', 'btn-sm', 'btn-outline-danger');
+
+  deleteBtn.addEventListener('click', async () => {
+    const confirmed = confirm('האם אתה בטוח שברצונך למחוק את הפוסט?');
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`http://localhost:3005/api/posts/${post._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        postElement.remove();
+        console.log('פוסט נמחק בהצלחה');
+      } else {
+        const err = await response.json();
+        console.error('שגיאה במחיקה:', err);
+      }
+    } catch (err) {
+      console.error('שגיאה במחיקת הפוסט:', err);
+    }
+  });
+
+  actionsWrapper.appendChild(editBtn);
+  actionsWrapper.appendChild(deleteBtn);
+}
+
+
   cardBody.appendChild(actionsWrapper);
 
   const commentSection = document.createElement('div');
@@ -255,6 +332,101 @@ function renderPost(post) {
   postElement.setAttribute('data-type', post.mediaType || 'text');
   postsContainer.prepend(postElement);
 }
+
+
+function showEditForm(post, postElement) {
+  if (postElement.querySelector('.edit-form')) return;
+
+  const oldTextElement = postElement.querySelector('.card-text');
+  if (!oldTextElement) return;
+
+  const formWrapper = document.createElement('div');
+  formWrapper.classList.add('edit-form', 'mt-2');
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = post.content;
+  input.classList.add('form-control', 'mb-2');
+
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = 'שמור';
+  saveBtn.classList.add('btn', 'btn-success', 'me-2');
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'ביטול';
+  cancelBtn.classList.add('btn', 'btn-secondary');
+
+  formWrapper.appendChild(input);
+  formWrapper.appendChild(saveBtn);
+  formWrapper.appendChild(cancelBtn);
+
+  oldTextElement.style.display = 'none';
+postElement.appendChild(formWrapper);
+
+  saveBtn.addEventListener('click', async () => {
+    const newContent = input.value.trim();
+    console.log('🟢 נלחץ שמור:', newContent);
+
+    if (newContent && newContent !== post.content) {
+      await updatePostContent(post._id, newContent, postElement);
+    } else {
+      console.log('⚠️ אין שינוי או טקסט ריק');
+    }
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    formWrapper.remove();
+    oldTextElement.style.display = '';
+  });
+}
+
+async function updatePostContent(postId, newContent, postElement) {
+  try {
+    console.log('🚀 שולח עדכון לשרת:', postId, newContent);
+
+    const response = await fetch(`http://localhost:3005/api/posts/${postId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ content: newContent })
+    });
+
+    if (response.ok) {
+      const updatedPost = await response.json();
+      console.log('✅ הפוסט עודכן בהצלחה:', updatedPost);
+
+      const textElement = postElement.querySelector('.card-text');
+      if (textElement) {
+        textElement.textContent = updatedPost.content;
+        textElement.style.display = '';
+      }
+
+      const editForm = postElement.querySelector('.edit-form');
+      if (editForm) {
+        editForm.remove();
+      }
+    } else {
+      const error = await response.json();
+      console.error('❌ שגיאה מהשרת:', error);
+    }
+  } catch (err) {
+    console.error('🛑 שגיאה בבקשת עדכון:', err);
+  }
+}
+
+const toggleGroupListBtn = document.getElementById('toggleGroupListBtn');
+const groupList = document.getElementById('groupList');
+
+toggleGroupListBtn.addEventListener('click', () => {
+  groupList.classList.toggle('d-none');
+  toggleGroupListBtn.textContent = groupList.classList.contains('d-none') ? 'הצג קבוצות' : 'הסתר קבוצות';
+});
+
+
+
+
 
 
 
@@ -405,6 +577,31 @@ async function searchPosts(query) {
     console.error('Failed to search posts:', err);
   }
 }
+
+async function loadGroups() {
+  try {
+    const response = await fetch('http://localhost:3005/api/groups', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    const groups = await response.json();
+
+    const listContainer = document.getElementById('groupList');
+    listContainer.innerHTML = '';
+
+    groups.forEach(group => {
+      const li = document.createElement('li');
+      li.classList.add('list-group-item');
+      li.textContent = `${group.name} - ${group.description || 'ללא תיאור'}`;
+      listContainer.appendChild(li);
+    });
+
+  } catch (err) {
+    console.error('❌ שגיאה בטעינת קבוצות:', err);
+  }
+}
+
+
 
 
 

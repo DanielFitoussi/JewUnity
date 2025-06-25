@@ -33,6 +33,28 @@
       </form>
     </div>
 
+
+<!-- טופס יצירת קבוצה -->
+<div class="card p-3 mb-4">
+  <h5>יצירת קבוצה חדשה</h5>
+  <form id="createGroupForm">
+    <input type="text" id="groupName" class="form-control mb-2" placeholder="שם קבוצה" required>
+    <input type="text" id="groupDescription" class="form-control mb-2" placeholder="תיאור (לא חובה)">
+    <button type="submit" class="btn btn-success">צור קבוצה</button>
+  </form>
+</div>
+
+<!-- כפתור להצגת קבוצות -->
+<div class="card p-3 mb-4">
+  <button id="toggleGroupListBtn" class="btn btn-secondary mb-2">הצג קבוצות</button>
+  <ul id="groupList" class="list-group d-none"></ul>
+</div>
+
+
+
+
+
+    
     <!-- כפתור סינון -->
     <div class="position-absolute top-0 end-0 m-3">
       <div class="dropdown">

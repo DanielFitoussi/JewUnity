@@ -132,3 +132,14 @@ body {
     transition: box-shadow 0.3s ease;
 }
 
+.btn-outline-danger {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+
