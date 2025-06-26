@@ -157,21 +157,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // שלב 3 - הצגת הפוסטים
     function renderPosts(posts) {
-        postsContainer.innerHTML = '';
-        posts.forEach(post => {
-            const card = document.createElement('div');
-            card.className = 'post-card';
+    postsContainer.innerHTML = '';
+    posts.forEach(post => {
+        const card = document.createElement('div');
+        card.className = 'post-card';
 
-            card.innerHTML = `
-        <h4>${post.authorName}</h4>
-        <p>${post.content}</p>
-        ${post.mediaUrl ? `<img class="post-media" src="${post.mediaUrl}" />` : ''}
-      `;
+        const fullName = post.author?.firstName && post.author?.lastName
+            ? `${post.author.firstName} ${post.author.lastName}`
+            : post.author?.username || 'משתמש לא ידוע';
 
-            postsContainer.prepend(card); // ✅ מוסיף למעלה
+        card.innerHTML = `
+            <h4>${fullName}</h4>
+            <p>${post.content}</p>
+            ${post.mediaUrl ? `<img class="post-media" src="${post.mediaUrl}" />` : ''}
+        `;
 
-        });
-    }
+        postsContainer.prepend(card);
+    });
+}
+
 
     // שלב 4 - חיפוש
     searchInput.addEventListener('input', () => {
