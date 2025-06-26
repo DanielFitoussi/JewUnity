@@ -243,6 +243,31 @@ const getGroupPosts = async (req, res) => {
   }
 };
 
+const getGroupById = async (req, res) => {
+  const { groupId } = req.params;
+
+  try {
+    const group = await Group.findById(groupId);
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found' });
+    }
+
+    const groupWithAdmin = {
+      _id: group._id,
+      name: group.name,
+      description: group.description,
+      members: group.members.map(m => m.userId.toString()),
+      adminId: group.owner.toString()  // ✅ כאן הוספנו את adminId = owner
+    };
+
+    res.status(200).json(groupWithAdmin);
+  } catch (err) {
+    console.error('Error fetching group by ID:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
 
 
 
@@ -256,5 +281,6 @@ module.exports = {
   deleteGroup,
   updateGroup,
   getAllGroups,
-  getGroupPosts 
+  getGroupPosts,
+  getGroupById
 };

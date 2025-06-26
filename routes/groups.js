@@ -13,10 +13,15 @@ router.get('/search', authenticateToken, groupController.searchGroups);
 
 router.get('/:groupId/posts', authenticateToken, groupController.getGroupPosts);
 
+router.get('/:groupId', authenticateToken, groupController.getGroupById); // ✅ חדש
+
+
 // סטטיסטיקות לקבוצה
 router.get('/:groupId/stats', authenticateToken, groupController.getGroupStats);
 // סטטיסטיקות מתקדמות לקבוצה
 router.get('/:groupId/advanced-stats', authenticateToken, groupController.getAdvancedGroupStats);
+
+
 
 
 

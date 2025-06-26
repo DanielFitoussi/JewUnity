@@ -21,6 +21,15 @@ const createPost = async (req, res) => {
     const author = req.user.userId;
     console.log('📥 POST חדש מתקבל עם:', { content, groupId, user: req.user });
 
+    if (groupId) {
+      const group = await Group.findById(groupId);
+      const isMember = group.members.some(m => m.userId.toString() === author.toString());
+
+      if (!isMember) {
+        return res.status(403).json({ error: 'Only group members can post in this group' });
+      }
+    }
+
 
     let mediaUrl = null;
     let mediaType = 'text';
