@@ -17,8 +17,10 @@ const getPosts = async (req, res) => {
 // יצירת פוסט חדש עם populate
 const createPost = async (req, res) => {
   try {
-    const { content } = req.body;
+    const { content, groupId } = req.body;
     const author = req.user.userId;
+    console.log('📥 POST חדש מתקבל עם:', { content, groupId, user: req.user });
+
 
     let mediaUrl = null;
     let mediaType = 'text';
@@ -32,14 +34,24 @@ const createPost = async (req, res) => {
       }
     }
 
+    console.log('📌 סוג טיפוס של groupId:', typeof groupId);
+
     const newPost = new Post({
       content,
       author,
       mediaUrl,
-      mediaType
+      mediaType,
+      groupId: groupId ? new mongoose.Types.ObjectId(groupId) : null
     });
 
+
     await newPost.save();
+    console.log('✅ פוסט נשמר:', newPost);
+    const fromDB = await Post.findById(newPost._id);
+    console.log('🔁 קריאה חזרה מהמסד:', fromDB);
+
+
+
     const populatedPost = await Post.findById(newPost._id).populate('author', 'username firstName lastName');
     res.status(201).json(populatedPost);
 

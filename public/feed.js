@@ -34,6 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+ 
+
+
+  
+
   document.getElementById('createGroupForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -83,8 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
     formData.append('content', content);
     if (file) {
       formData.append('media', file);
-      formData.append('mediaType', file.type.startsWith('image') ? 'image' :
-        file.type.startsWith('video') ? 'video' : 'text');
     }
 
     try {
@@ -596,9 +599,21 @@ async function loadGroups() {
   const li = document.createElement('li');
   li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
 
-  const text = document.createElement('span');
-  text.textContent = `${group.name} - ${group.description || 'ללא תיאור'}`;
-  li.appendChild(text);
+  const link = document.createElement('a');
+link.href = `group.html?groupId=${group._id}`;
+link.textContent = group.name;
+link.style.textDecoration = 'none';
+link.style.fontWeight = 'bold';
+
+const desc = document.createElement('span');
+desc.textContent = ` - ${group.description || 'ללא תיאור'}`;
+
+const text = document.createElement('span');
+text.appendChild(link);
+text.appendChild(desc);
+
+li.appendChild(text);
+
 
   const actions = document.createElement('div');
 
@@ -661,9 +676,22 @@ document.getElementById('groupSearchInput').addEventListener('input', async func
       const li = document.createElement('li');
       li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
 
-      const text = document.createElement('span');
-      text.textContent = `${group.name} - ${group.description || 'ללא תיאור'}`;
-      li.appendChild(text);
+      const link = document.createElement('a');
+link.href = `group.html?groupId=${group._id}`;
+link.textContent = group.name;
+link.style.textDecoration = 'none';
+link.style.fontWeight = 'bold';
+link.style.color = 'inherit';
+
+const desc = document.createElement('span');
+desc.textContent = ` - ${group.description || 'ללא תיאור'}`;
+
+const text = document.createElement('span');
+text.appendChild(link);
+text.appendChild(desc);
+
+li.appendChild(text);
+
 
       const actions = document.createElement('div');
 

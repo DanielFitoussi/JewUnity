@@ -1,6 +1,8 @@
 const Group = require('../models/groups');
 const User = require('../models/user');
 const mongoose = require('mongoose');
+const Post = require('../models/posts');
+
 
 
 
@@ -229,6 +231,18 @@ const getAllGroups = async (req, res) => {
   }
 };
 
+const getGroupPosts = async (req, res) => {
+  const { groupId } = req.params;
+
+  try {
+    const posts = await Post.find({ groupId }).populate('author', 'username');
+    res.status(200).json(posts);
+  } catch (err) {
+    console.error('שגיאה בשליפת פוסטים לקבוצה:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 
 
 
@@ -241,5 +255,6 @@ module.exports = {
   getAdvancedGroupStats,
   deleteGroup,
   updateGroup,
-  getAllGroups
+  getAllGroups,
+  getGroupPosts 
 };

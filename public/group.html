@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Group Feed</title>
+    <link rel="stylesheet" href="group.css" />
+</head>
+
+<body>
+    <header>
+        <h1 id="groupTitle">Group Name</h1>
+        <button id="backToFeed">חזרה לעמוד הראשי</button>
+    </header>
+
+    <section id="groupInfo">
+        <!-- יוצג רק למנהל הקבוצה -->
+        <button id="editGroupBtn" class="admin-only hidden">ערוך פרטי קבוצה</button>
+        <p id="groupDescription">תיאור הקבוצה יופיע כאן</p>
+    </section>
+
+    <section id="postFormSection" class="member-only hidden">
+        <form id="postForm">
+            <textarea id="postContent" placeholder="מה חדש בקבוצה?"></textarea>
+            <input type="file" id="mediaUpload" accept="image/*,video/*">
+            <button type="submit">פרסם</button>
+        </form>
+    </section>
+<!-- שורת חיפוש -->
+<section id="searchSection">
+  <input type="text" id="searchInput" placeholder="חפש פוסטים בקבוצה">
+</section>
+
+<!-- אזור הצגת פוסטים -->
+<section id="postsContainer">
+  <!-- כאן יופיעו הפוסטים -->
+</section>
+
+
+
+    <script src="group.js"></script>
+</body>
+
+</html>
