@@ -2,47 +2,50 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Group Feed</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="group.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Group Feed</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <link rel="stylesheet" href="group.css" />
 </head>
 
 <body class="bg-light">
-  <header class="bg-primary text-white py-3 px-4 d-flex justify-content-between align-items-center">
-    <h1 id="groupTitle" class="h4 m-0">Group Name</h1>
-    <button id="backToFeed" class="btn btn-light btn-sm">חזרה לעמוד הראשי</button>
-  </header>
+    <header class="bg-primary text-white py-3 px-4 d-flex justify-content-between align-items-center">
+        <h1 id="groupTitle" class="h4 m-0">Group Name</h1>
+        <button id="backToFeed" class="btn btn-light btn-sm">חזרה לעמוד הראשי</button>
+    </header>
 
-  <main class="container py-4">
-    <section id="groupInfo" class="text-center mb-4">
-      <div class="d-flex justify-content-center gap-2 mb-2">
-        <button id="editGroupBtn" class="btn btn-warning btn-sm admin-only hidden">ערוך פרטי קבוצה</button>
-        <button id="leaveGroupBtn" class="btn btn-outline-danger btn-sm member-only hidden">עזוב קבוצה</button>
-      </div>
-      <p id="groupDescription" class="text-muted">תיאור הקבוצה יופיע כאן</p>
-    </section>
+    <main class="container py-4">
+        <section id="groupInfo" class="text-center mb-4">
+            <div class="d-flex justify-content-center gap-2 mb-2">
+                <button id="editGroupBtn" class="btn btn-warning btn-sm admin-only hidden">ערוך פרטי קבוצה</button>
+                <button id="leaveGroupBtn" class="btn btn-outline-danger btn-sm member-only hidden">עזוב קבוצה</button>
+            </div>
+            <p id="groupDescription" class="text-muted">תיאור הקבוצה יופיע כאן</p>
+        </section>
 
-    <section id="postFormSection" class="member-only hidden mb-4">
-      <form id="postForm" class="card p-3 shadow-sm">
-        <textarea id="postContent" class="form-control mb-2" placeholder="מה חדש בקבוצה?"></textarea>
-        <input type="file" id="mediaUpload" accept="image/*,video/*" class="form-control mb-2">
-        <button type="submit" class="btn btn-success">פרסם</button>
-      </form>
-    </section>
+        <section id="postFormSection" class="member-only hidden mb-4">
+            <form id="postForm" class="card p-3 shadow-sm">
+                <textarea id="postContent" class="form-control mb-2" placeholder="מה חדש בקבוצה?"></textarea>
+                <input type="file" id="mediaUpload" accept="image/*,video/*" class="form-control mb-2">
+                <button type="submit" class="btn btn-success">פרסם</button>
+            </form>
+        </section>
 
-    <section id="searchSection" class="mb-4">
-      <input type="text" id="searchInput" class="form-control" placeholder="חפש פוסטים בקבוצה">
-    </section>
+        <section id="searchSection" class="mb-4">
+            <input type="text" id="searchInput" class="form-control" placeholder="חפש פוסטים בקבוצה">
+        </section>
 
-    <section id="postsContainer" class="d-flex flex-column gap-3">
-      <!-- כאן יופיעו הפוסטים -->
-    </section>
-  </main>
+        <section id="postsContainer" class="d-flex flex-column gap-3">
+            <!-- כאן יופיעו הפוסטים -->
+        </section>
+    </main>
 
-  <script src="group.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="group.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

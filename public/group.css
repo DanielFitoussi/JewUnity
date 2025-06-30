@@ -85,3 +85,42 @@ header {
 .hidden { display: none; }
 .admin-only { display: inline-block; }
 .member-only { display: block; }
+
+
+/* כפתורי אייקון בסיסיים */
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.btn-icon:hover {
+  transform: scale(1.2);
+  color: #007bff;
+}
+
+.btn-icon i.liked {
+  color: red;
+}
+
+/* קונטיינר של כפתורים */
+.post-card .d-flex.gap-3 {
+  gap: 12px;
+}
+
+/* תגובות */
+.comment-section {
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.comment {
+  margin-bottom: 5px;
+  font-size: 0.95rem;
+  color: #333;
+}

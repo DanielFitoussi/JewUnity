@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-    loadGroups();
+  loadGroups();
 
   renderPostsPerGroupChart(token);
 
@@ -26,18 +26,26 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
-      const posts = await response.json();
-      postsContainer.innerHTML = '';
-      posts.reverse().forEach(post => renderPost(post));
+    const posts = await response.json();
+
+// סינון פוסטים שלא שייכים לקבוצה
+const filteredPosts = posts.filter(post => !post.groupId);
+
+// ניקוי תצוגה
+postsContainer.innerHTML = '';
+
+// הצגת הפוסטים הרלוונטיים
+filteredPosts.reverse().forEach(post => renderPost(post));
+
     } catch (err) {
       console.error('Failed to load posts:', err);
     }
   }
 
- 
 
 
-  
+
+
 
   document.getElementById('createGroupForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -233,16 +241,16 @@ function renderPost(post) {
   actionsWrapper.appendChild(commentCountSpan);
   if (post.author?._id === userId) {
     const editBtn = document.createElement('button');
-    editBtn.textContent = 'ערוך';
-    editBtn.classList.add('btn', 'btn-sm', 'btn-outline-secondary');
+    editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
+    editBtn.classList.add('btn-icon');
 
     editBtn.addEventListener('click', () => {
       showEditForm(post, postElement);
     });
 
     const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = 'מחק';
-    deleteBtn.classList.add('btn', 'btn-sm', 'btn-outline-danger');
+    deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
+    deleteBtn.classList.add('btn-icon');
 
     deleteBtn.addEventListener('click', async () => {
       const confirmed = confirm('האם אתה בטוח שברצונך למחוק את הפוסט?');
@@ -442,17 +450,18 @@ async function renderPostsPerGroupChart(token) {
     });
     const data = await response.json();
 
-    console.log("📊 נתוני הגרף:", data);
-
-
     const svg = d3.select("#postsPerGroupChart");
-    const width = +svg.attr("width");
-    const height = +svg.attr("height");
     svg.selectAll("*").remove(); // ניקוי קודם
 
-    const margin = { top: 20, right: 30, bottom: 50, left: 50 };
+    const width = +svg.attr("width") || 600;
+    const height = +svg.attr("height") || 400;
+    const margin = { top: 20, right: 30, bottom: 60, left: 50 };
+
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
+
+    const chart = svg.append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
     const x = d3.scaleBand()
       .domain(data.map(d => d.groupName))
@@ -464,17 +473,18 @@ async function renderPostsPerGroupChart(token) {
       .nice()
       .range([chartHeight, 0]);
 
-    const chart = svg.append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    chart.append("g").call(d3.axisLeft(y));
+    chart.append("g")
+      .call(d3.axisLeft(y));
 
     chart.append("g")
       .attr("transform", `translate(0,${chartHeight})`)
       .call(d3.axisBottom(x))
       .selectAll("text")
-      .attr("transform", "rotate(-30)")
-      .style("text-anchor", "end");
+      .attr("transform", "rotate(30)")
+      .style("text-anchor", "start")
+      .attr("dx", "0.5em")
+      .attr("dy", "0.25em")
+      .style("font-size", "12px");
 
     chart.selectAll("rect")
       .data(data)
@@ -484,21 +494,22 @@ async function renderPostsPerGroupChart(token) {
       .attr("y", d => y(d.postsCount))
       .attr("width", x.bandwidth())
       .attr("height", d => chartHeight - y(d.postsCount))
-      .attr("fill", (d, i) => d3.schemeCategory10[i % 10]);
+      .attr("fill", (d, i) => d3.schemeSet2[i % 8]);
 
-    chart.selectAll("text.labels")
+    chart.selectAll("text.bar-label")
       .data(data)
       .enter()
       .append("text")
-      .attr("class", "chart-label")
+      .attr("class", "bar-label")
       .attr("x", d => x(d.groupName) + x.bandwidth() / 2)
       .attr("y", d => y(d.postsCount) - 5)
+      .attr("text-anchor", "middle")
       .text(d => d.postsCount);
-
   } catch (err) {
-    console.error("Failed to load chart:", err);
+    console.error("❌ Failed to load posts per group chart:", err);
   }
 }
+
 
 async function renderMediaTypeChart(token) {
   try {
@@ -508,16 +519,17 @@ async function renderMediaTypeChart(token) {
 
     const data = await response.json();
 
+    const width = 300;
+    const height = 300;
+    const radius = Math.min(width, height) / 2 - 32; // ← שוליים נוספים
+
+
     const svg = d3.select("#postMediaTypeChart")
-      .attr("width", 600)
-      .attr("height", 400);
+      .attr("width", width)
+      .attr("height", height);
 
-    const width = +svg.attr("width");
-    const height = +svg.attr("height");
+    svg.selectAll("*").remove();
 
-    svg.selectAll("*").remove(); // ניקוי קודם
-
-    const radius = Math.min(width, height) / 2;
     const chart = svg.append("g")
       .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
@@ -533,20 +545,21 @@ async function renderMediaTypeChart(token) {
       .enter()
       .append("path")
       .attr("d", arc)
-      .attr("class", d => `pie-slice ${d.data.mediaType}`);
+      .attr("fill", d => color(d.data.mediaType));
 
     chart.selectAll("text")
       .data(pie(data))
       .enter()
       .append("text")
       .attr("transform", d => `translate(${arc.centroid(d)})`)
-      .attr("class", "pie-label")
+      .attr("text-anchor", "middle")
+      .style("font-size", "10px")
       .text(d => `${d.data.mediaType}: ${d.data.count}`);
-
   } catch (err) {
-    console.error("Failed to load media type chart:", err);
+    console.error("❌ Failed to load media type chart:", err);
   }
 }
+
 
 function filterPosts(type) {
   const posts = document.querySelectorAll('#postsContainer .card');
@@ -595,57 +608,57 @@ async function loadGroups() {
     const listContainer = document.getElementById('groupList');
     listContainer.innerHTML = '';
 
-   groups.forEach(group => {
-  const li = document.createElement('li');
-  li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+    groups.forEach(group => {
+      const li = document.createElement('li');
+      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
 
-  const link = document.createElement('a');
-link.href = `group.html?groupId=${group._id}`;
-link.textContent = group.name;
-link.style.textDecoration = 'none';
-link.style.fontWeight = 'bold';
+      const link = document.createElement('a');
+      link.href = `group.html?groupId=${group._id}`;
+      link.textContent = group.name;
+      link.style.textDecoration = 'none';
+      link.style.fontWeight = 'bold';
 
-const desc = document.createElement('span');
-desc.textContent = ` - ${group.description || 'ללא תיאור'}`;
+      const desc = document.createElement('span');
+      desc.textContent = ` - ${group.description || 'ללא תיאור'}`;
 
-const text = document.createElement('span');
-text.appendChild(link);
-text.appendChild(desc);
+      const text = document.createElement('span');
+      text.appendChild(link);
+      text.appendChild(desc);
 
-li.appendChild(text);
+      li.appendChild(text);
 
 
-  const actions = document.createElement('div');
+      const actions = document.createElement('div');
 
-  // אם המשתמש הוא הבעלים
-  if (group.owner === userId) {
-    const editBtn = document.createElement('button');
-    editBtn.textContent = 'ערוך';
-    editBtn.classList.add('btn', 'btn-sm', 'btn-warning', 'ms-2');
-    editBtn.addEventListener('click', () => showEditGroupForm(group));
+      // אם המשתמש הוא הבעלים
+      if (group.owner === userId) {
+        const editBtn = document.createElement('button');
+        editBtn.textContent = 'ערוך';
+        editBtn.classList.add('btn', 'btn-sm', 'btn-warning', 'ms-2');
+        editBtn.addEventListener('click', () => showEditGroupForm(group));
 
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = 'מחק';
-    deleteBtn.classList.add('btn', 'btn-sm', 'btn-danger');
-    deleteBtn.addEventListener('click', () => deleteGroup(group._id));
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'מחק';
+        deleteBtn.classList.add('btn', 'btn-sm', 'btn-danger');
+        deleteBtn.addEventListener('click', () => deleteGroup(group._id));
 
-    actions.appendChild(editBtn);
-    actions.appendChild(deleteBtn);
-  } else {
-    // אם המשתמש לא הבעלים ולא חבר בקבוצה → מציע להצטרף
-    const isMember = group.members.some(m => m.userId === userId);
-    if (!isMember) {
-      const joinBtn = document.createElement('button');
-      joinBtn.textContent = 'הצטרף';
-      joinBtn.classList.add('btn', 'btn-sm', 'btn-outline-primary');
-      joinBtn.addEventListener('click', () => joinGroup(group._id));
-      actions.appendChild(joinBtn);
-    }
-  }
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+      } else {
+        // אם המשתמש לא הבעלים ולא חבר בקבוצה → מציע להצטרף
+        const isMember = group.members.some(m => m.userId === userId);
+        if (!isMember) {
+          const joinBtn = document.createElement('button');
+          joinBtn.textContent = 'הצטרף';
+          joinBtn.classList.add('btn', 'btn-sm', 'btn-outline-primary');
+          joinBtn.addEventListener('click', () => joinGroup(group._id));
+          actions.appendChild(joinBtn);
+        }
+      }
 
-  li.appendChild(actions);
-  listContainer.appendChild(li);
-});
+      li.appendChild(actions);
+      listContainer.appendChild(li);
+    });
 
   } catch (err) {
     console.error('❌ שגיאה בטעינת קבוצות:', err);
@@ -677,20 +690,20 @@ document.getElementById('groupSearchInput').addEventListener('input', async func
       li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
 
       const link = document.createElement('a');
-link.href = `group.html?groupId=${group._id}`;
-link.textContent = group.name;
-link.style.textDecoration = 'none';
-link.style.fontWeight = 'bold';
-link.style.color = 'inherit';
+      link.href = `group.html?groupId=${group._id}`;
+      link.textContent = group.name;
+      link.style.textDecoration = 'none';
+      link.style.fontWeight = 'bold';
+      link.style.color = 'inherit';
 
-const desc = document.createElement('span');
-desc.textContent = ` - ${group.description || 'ללא תיאור'}`;
+      const desc = document.createElement('span');
+      desc.textContent = ` - ${group.description || 'ללא תיאור'}`;
 
-const text = document.createElement('span');
-text.appendChild(link);
-text.appendChild(desc);
+      const text = document.createElement('span');
+      text.appendChild(link);
+      text.appendChild(desc);
 
-li.appendChild(text);
+      li.appendChild(text);
 
 
       const actions = document.createElement('div');

@@ -71,14 +71,18 @@
     <div id="postsContainer"></div>
 
     <section class="mt-5">
-      <h5 class="fw-bold mb-3">פוסטים לפי קבוצה</h5>
-      <svg id="postsPerGroupChart" width="100%" height="400"></svg>
-    </section>
+  <div class="charts-container">
+    <div class="chart-box">
+      <h5 class="fw-bold mb-3 text-center">פוסטים לפי קבוצה</h5>
+      <svg id="postsPerGroupChart" width="400" height="300"></svg>
+    </div>
+    <div class="chart-box">
+      <h5 class="fw-bold mb-3 text-center">סוגי הפוסטים במערכת</h5>
+      <svg id="postMediaTypeChart" width="300" height="300"></svg>
+    </div>
+  </div>
+</section>
 
-    <section class="mt-5">
-      <h5 class="fw-bold mb-3">סוגי הפוסטים במערכת</h5>
-      <svg id="postMediaTypeChart" class="chart-svg"></svg>
-    </section>
   </main>
 
   <script src="feed.js"></script>

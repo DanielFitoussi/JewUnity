@@ -162,24 +162,166 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    function renderPosts(posts) {
-        postsContainer.innerHTML = '';
-        posts.forEach(post => {
-            const card = document.createElement('div');
-            card.className = 'post-card';
+   function renderPost(post) {
+  const postsContainer = document.getElementById('postsContainer');
+  const token = localStorage.getItem('token');
+  const userId = parseJwt(token).userId;
 
-            const fullName = post.author?.firstName && post.author?.lastName
-                ? `${post.author.firstName} ${post.author.lastName}`
-                : post.author?.username || 'משתמש לא ידוע';
+  const postElement = document.createElement('div');
+  postElement.classList.add('post-card');
 
-            card.innerHTML = `
-                <h4>${fullName}</h4>
-                <p>${post.content}</p>
-                ${post.mediaUrl ? `<img class="post-media" src="${post.mediaUrl}" />` : ''}
-            `;
-            postsContainer.prepend(card);
-        });
+  const fullName = post.author?.firstName && post.author?.lastName
+    ? `${post.author.firstName} ${post.author.lastName}`
+    : post.author?.username || 'משתמש לא ידוע';
+
+  const header = document.createElement('div');
+  header.className = 'd-flex justify-content-between align-items-center mb-2';
+  header.innerHTML = `
+    <strong>${fullName}</strong>
+    <small class="text-muted">${new Date(post.createdAt).toLocaleDateString()}</small>
+  `;
+
+  const content = document.createElement('p');
+  content.textContent = post.content;
+
+  postElement.appendChild(header);
+  postElement.appendChild(content);
+
+  if (post.mediaUrl && post.mediaType !== 'text') {
+    const media = document.createElement(post.mediaType === 'image' ? 'img' : 'video');
+    media.src = post.mediaUrl;
+    media.className = 'post-media';
+    if (post.mediaType === 'video') media.controls = true;
+    postElement.appendChild(media);
+  }
+
+  const actions = document.createElement('div');
+  actions.className = 'd-flex gap-3 align-items-center mt-2';
+
+  // לייק
+  const likeBtn = document.createElement('button');
+  likeBtn.className = 'btn-icon';
+  const likeIcon = document.createElement('i');
+  likeIcon.classList.add('bi');
+  likeIcon.classList.add(post.likedBy.includes(userId) ? 'bi-heart-fill' : 'bi-heart');
+  if (post.likedBy.includes(userId)) likeIcon.classList.add('liked');
+  likeBtn.appendChild(likeIcon);
+
+  const likeCount = document.createElement('span');
+  likeCount.textContent = post.likedBy.length;
+
+  likeBtn.addEventListener('click', async () => {
+    try {
+      const res = await fetch(`http://localhost:3005/api/posts/${post._id}/like`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      likeCount.textContent = data.likes;
+      likeIcon.className = data.likedBy.includes(userId) ? 'bi bi-heart-fill liked' : 'bi bi-heart';
+    } catch (err) {
+      console.error('שגיאה בלייק:', err);
     }
+  });
+
+  // תגובה
+  const commentBtn = document.createElement('button');
+  commentBtn.className = 'btn-icon';
+  commentBtn.innerHTML = '<i class="bi bi-chat"></i>';
+  const commentCount = document.createElement('span');
+  commentCount.textContent = post.comments.length;
+
+  // עריכה ומחיקה
+  if (post.author?._id === userId) {
+    const editBtn = document.createElement('button');
+    editBtn.className = 'btn-icon';
+    editBtn.innerHTML = '<i class="bi bi-pencil"></i>';
+    editBtn.addEventListener('click', () => showEditForm(post, postElement));
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn-icon';
+    deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
+    deleteBtn.addEventListener('click', async () => {
+      if (!confirm('למחוק פוסט?')) return;
+      try {
+        const res = await fetch(`http://localhost:3005/api/posts/${post._id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) postElement.remove();
+      } catch (err) {
+        console.error('שגיאה במחיקה:', err);
+      }
+    });
+
+    actions.appendChild(editBtn);
+    actions.appendChild(deleteBtn);
+  }
+
+  actions.appendChild(likeBtn);
+  actions.appendChild(likeCount);
+  actions.appendChild(commentBtn);
+  actions.appendChild(commentCount);
+  postElement.appendChild(actions);
+
+  // תגובות
+  const commentSection = document.createElement('div');
+  commentSection.className = 'comment-section mt-2';
+  commentSection.style.display = 'none';
+
+  const commentInput = document.createElement('input');
+  commentInput.type = 'text';
+  commentInput.placeholder = 'כתוב תגובה...';
+  commentInput.className = 'form-control form-control-sm mb-2';
+
+  const commentList = document.createElement('div');
+  post.comments.forEach(comment => {
+    const commentItem = document.createElement('div');
+    commentItem.className = 'comment';
+    commentItem.textContent = `${comment.author?.username || 'User'}: ${comment.content}`;
+    commentList.appendChild(commentItem);
+  });
+
+  commentBtn.addEventListener('click', () => {
+    commentSection.style.display = commentSection.style.display === 'none' ? 'block' : 'none';
+  });
+
+  commentInput.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      const text = commentInput.value.trim();
+      if (text) {
+        try {
+          const res = await fetch(`http://localhost:3005/api/posts/${post._id}/comments`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ content: text })
+          });
+          const updatedComments = await res.json();
+          commentList.innerHTML = '';
+          updatedComments.forEach(comment => {
+            const commentItem = document.createElement('div');
+            commentItem.className = 'comment';
+            commentItem.textContent = `${comment.author?.username || 'User'}: ${comment.content}`;
+            commentList.appendChild(commentItem);
+          });
+          commentCount.textContent = updatedComments.length;
+          commentInput.value = '';
+        } catch (err) {
+          console.error('שגיאה בהוספת תגובה:', err);
+        }
+      }
+    }
+  });
+
+  commentSection.appendChild(commentInput);
+  commentSection.appendChild(commentList);
+  postElement.appendChild(commentSection);
+  postsContainer.prepend(postElement);
+}
+
 
     searchInput.addEventListener('input', () => {
         const keyword = searchInput.value.toLowerCase();
@@ -222,6 +364,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    function renderPosts(posts) {
+  postsContainer.innerHTML = '';
+  posts.forEach(post => renderPost(post));
+}
+
+
     loadGroupPosts();
 });
 
@@ -232,4 +380,77 @@ function parseJwt(token) {
     } catch (e) {
         return {};
     }
+}
+
+function showEditForm(post, postElement) {
+  if (postElement.querySelector('.edit-form')) return;
+
+  const oldTextElement = postElement.querySelector('p');
+  if (!oldTextElement) return;
+
+  const formWrapper = document.createElement('div');
+  formWrapper.classList.add('edit-form', 'mt-2');
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = post.content;
+  input.classList.add('form-control', 'mb-2');
+
+  const saveBtn = document.createElement('button');
+  saveBtn.textContent = 'שמור';
+  saveBtn.classList.add('btn', 'btn-success', 'me-2');
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'ביטול';
+  cancelBtn.classList.add('btn', 'btn-secondary');
+
+  formWrapper.appendChild(input);
+  formWrapper.appendChild(saveBtn);
+  formWrapper.appendChild(cancelBtn);
+
+  oldTextElement.style.display = 'none';
+  postElement.appendChild(formWrapper);
+
+  saveBtn.addEventListener('click', async () => {
+    const newContent = input.value.trim();
+    if (newContent && newContent !== post.content) {
+      await updatePostContent(post._id, newContent, postElement);
+    }
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    formWrapper.remove();
+    oldTextElement.style.display = '';
+  });
+}
+
+async function updatePostContent(postId, newContent, postElement) {
+  const token = localStorage.getItem('token');
+
+  try {
+    const response = await fetch(`http://localhost:3005/api/posts/${postId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ content: newContent })
+    });
+
+    if (response.ok) {
+      const updatedPost = await response.json();
+      const textElement = postElement.querySelector('p');
+      if (textElement) {
+        textElement.textContent = updatedPost.content;
+        textElement.style.display = '';
+      }
+      const editForm = postElement.querySelector('.edit-form');
+      if (editForm) editForm.remove();
+    } else {
+      const error = await response.json();
+      console.error('שגיאה מהשרת:', error);
+    }
+  } catch (err) {
+    console.error('שגיאה בבקשת עדכון:', err);
+  }
 }
