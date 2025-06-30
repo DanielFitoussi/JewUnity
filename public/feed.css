@@ -1,274 +1,129 @@
-/* מדיה (תמונה / וידאו) */
-.post-media,
-img,
-video {
-  max-width: 100%;
-  max-height: 400px;
-  margin-top: 10px;
-  border-radius: 10px;
-  object-fit: cover;
+/* Reset בסיסי */
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* הגבלת רוחב של פוסטים + מיקום במרכז */
-.card {
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* טופס הוספת פוסט */
-#postForm {
-  width: 100%;
-}
-
-/* עיצוב רקע כללי */
 body {
-  background-color: #f8f9fa;
-  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+  margin: 0;
+  padding: 0;
 }
 
-/* עיצוב כפתור שליחת פוסט */
-button[type="submit"] {
-  width: 100%;
-  font-weight: bold;
+/* כרטיסי תוכן */
+.card {
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  background-color: white;
+  border: none;
 }
 
-/* מרווח בין פוסטים */
-.card + .card {
-  margin-top: 1rem;
+/* כפתורי פעולה */
+.btn {
+  border-radius: 25px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* כפתורי לייק ותגובה - סגנון אחיד */
+.btn-primary {
+  background-color: #1da1f2;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #0d8ddb;
+}
+
+.btn-outline-primary:hover {
+  background-color: #e6f4ff;
+  color: #007bff;
+}
+
+/* אינפוט */
+.form-control:focus {
+  border-color: #1da1f2;
+  box-shadow: 0 0 0 0.2rem rgba(29, 161, 242, 0.25);
+}
+
+/* כפתורי אייקון */
 .btn-icon {
   background: none;
   border: none;
-  padding: 0;
   font-size: 1.3rem;
+  color: #555;
   cursor: pointer;
-  outline: none;
-  color: #666;
-  line-height: 1;
+  transition: transform 0.2s, color 0.2s;
 }
 
 .btn-icon:hover {
-  transform: scale(1.1);
-  transition: 0.2s;
+  transform: scale(1.2);
   color: #1da1f2;
 }
 
-.btn-icon:focus {
-  outline: none;
-  box-shadow: none;
-}
-
-/* תגובה בודדת */
+/* תגובות */
 .comment {
-  background-color: #f1f1f1;
-  border-radius: 10px;
-  padding: 5px 10px;
+  background-color: #f1f3f5;
+  border-radius: 8px;
+  padding: 8px;
   margin-top: 5px;
   font-size: 0.9rem;
-  color: #333;
 }
 
-/* מידע משתמש */
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* מדיה בפוסטים */
+.post-media {
+  max-width: 100%;
+  max-height: 400px;
+  margin-top: 10px;
+  border-radius: 12px;
+  object-fit: cover;
 }
 
-/* תאריך */
-.post-date {
-  font-size: 0.8rem;
-  color: #888;
-  white-space: nowrap;
+/* גרפים */
+.chart-wrapper, .chart-svg {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
 }
 
-.btn-icon i.bi-trash {
-  color: #dc3545;
+.chart-title {
+  font-weight: bold;
+  text-align: right;
+  margin-bottom: 0.5rem;
 }
 
-.btn-icon i.bi-trash:hover {
-  color: #a71d2a;
+/* פילטרים */
+.dropdown .dropdown-menu {
+  min-width: 180px;
 }
 
-.btn-icon i.bi-pencil {
-  color: #0d6efd;
-}
-
-.btn-icon i.bi-pencil:hover {
-  color: #0a58ca;
-}
-
-/* נוסיף לייק צבעוני */
+/* מצב לייק */
 .liked {
   color: #dc3545;
 }
 
-.comment-section {
-  margin-top: 10px;
-  padding-top: 5px;
-  border-top: 1px solid #ddd;
-}
-
-.comment {
-  background-color: #f1f1f1;
-  border-radius: 10px;
-  padding: 5px 10px;
-  margin-top: 5px;
-  font-size: 0.9rem;
-  color: #333;
-}
-
-#postsPerGroupChart {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-}
-
-.chart-label {
-  font-size: 12px;
-  fill: #333;
-  text-anchor: middle;
-}
-
-.chart-header {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.5rem;
-}
-
-
-.chart-wrapper {
-  width: 600px;
-  margin: 0 auto;
-}
-
-.chart-title {
-  text-align: right;
-  margin-bottom: 0.5rem;
-}
-
-/* עטיפת גרף */
-.chart-container {
-  margin-top: 2rem;
-  text-align: center;
-}
-
-/* כותרת של הגרף */
-.chart-title {
-  text-align: right;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-}
-
-/* גודל ברירת מחדל של SVG */
-#postMediaTypeChart {
-  width: 600px;
-  height: 400px;
-  margin: 0 auto;
-  display: block;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-}
-
-/* צבעים לפי סוג */
-.pie-slice.text {
-  fill: #1da1f2;
-  stroke: #fff;
-  stroke-width: 2px;
-}
-
-.pie-slice.image {
-  fill: #ff9900;
-  stroke: #fff;
-  stroke-width: 2px;
-}
-
-.pie-slice.video {
-  fill: #28a745;
-  stroke: #fff;
-  stroke-width: 2px;
-}
-
-/* תוויות */
+/* תגיות */
 .pie-label {
   font-size: 14px;
-  fill: #000;
   text-anchor: middle;
 }
 
-.chart-svg {
-  width: 600px;
-  height: 400px;
-  display: block;
-  margin: 0 auto;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 10px;
+/* קישורים */
+a {
+  text-decoration: none;
 }
 
-.actionsWrapper button {
-  margin-inline-end: 4px;
-}
-
-.group-item-text {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-
-.btn-join-group {
-  background-color: #e6f0ff;
-  border: 1px solid #3399ff;
-  color: #0056b3;
-  font-weight: 500;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.btn-join-group:hover {
-  background-color: #cce0ff;
-  color: #003366;
-}
-
+/* קבוצות */
 #groupList li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
   flex-wrap: nowrap;
+  padding: 0.5rem 1rem;
 }
 
 #groupList li span {
+  flex-grow: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex-grow: 1;
 }
-
-#groupList li div {
-  flex-shrink: 0;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-

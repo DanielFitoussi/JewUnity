@@ -1,145 +1,89 @@
-* {
-    font-family: 'Assistant', sans-serif;
-    font-family: ui sans;
-
-}
-
+/* בסיס עיצוב */
 body {
-    background: linear-gradient(to right, white, #85b5fc);
-    /* לבן למעלה, כחול למטה */
-    min-height: 100vh;
-    margin: 0;
-
-
-
+  background: linear-gradient(135deg, #eaf6ff, #ffffff);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
 }
 
-.login-box {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-left: 25px;
-    padding-top: 200px;
-
+h2 {
+  font-weight: 600;
 }
 
-
-
-.form-fields {
-    margin-bottom: 15px;
-
+.btn {
+  border-radius: 25px;
+  font-weight: 500;
 }
-
-.input-signIn {
-    border-width: 0.01;
-    width: 464px;
-}
-
-.input-signUp {
-    border-width: 0.01;
-    width: 200px;
-    margin-right: 10px;
-}
-
-
-#parg-signIn {
-    color: rgb(96, 96, 96);
-    font-weight: normal;
-    font-size: 16px;
-}
-
-.w-38 {
-    width: 34%;
-}
-
-.w-10 {
-    width: 16%;
-}
-
-.tallBtnSign {
-    height: 50px;
-    line-height: 60px;
-    font-size: 18px;
-    padding: 0 20px;
-}
-
-.BtnDownload {
-    height: 53px;
-    line-height: 60px;
-    font-size: 18px;
-    padding: 0 20px;
-}
-
-
-#parg-dateSignUp {
-    color: rgb(96, 96, 96);
-    font-size: 12px;
-    margin-bottom: 2px;
-
-}
-
-#parg-genderSignUp {
-    color: rgb(96, 96, 96);
-    font-size: 12px;
-    margin-bottom: 2px;
-    margin-left: 138px;
-}
-
 
 .btn-primary {
-    background-color: rgb(46, 46, 242) !important;
-
+  background-color: #1da1f2;
+  border: none;
 }
 
-
-#pargTermsOfService {
-    font-size: 12px;
-    color: rgb(96, 96, 96);
-    margin-left: 50px;
+.btn-primary:hover {
+  background-color: #0d8ddb;
 }
 
-.linkTermsOfService {
-    color: rgb(96, 96, 96);
+.btn-outline-secondary {
+  border-color: #ccc;
+  color: #333;
 }
 
-.linkFooter {
-    color: rgb(96, 96, 96);
-    font-size: 12px;
-    text-decoration: none;
-
+.btn-outline-secondary:hover {
+  background-color: #f2f2f2;
 }
 
-.footerLinks {
-    margin-left: 50px;
-
+.modal-content {
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
-.downloadName {
-    font-weight: bold;
+input.form-control,
+select.form-select {
+  border-radius: 12px;
+  padding: 10px 15px;
+  font-size: 0.95rem;
 }
 
-#site-footer-note {
-    font-size: 12px;
-    color: rgb(96, 96, 96);
-    margin-left: 150px;
+input:focus,
+select:focus {
+  border-color: #1da1f2;
+  box-shadow: 0 0 0 0.2rem rgba(29, 161, 242, 0.25);
 }
 
-.loginPageBtn {
-      box-shadow:
-        0 0 6px rgba(255, 255, 255, 0.25),
-        0 0 12px rgba(255, 255, 255, 0.18),
-        0 0 20px rgba(255, 255, 255, 0.12);
-    transition: box-shadow 0.3s ease;
+.modal-title {
+  font-weight: 600;
 }
 
-.btn-outline-danger {
-  color: #dc3545;
-  border-color: #dc3545;
+.text-muted a {
+  color: #1da1f2;
+  text-decoration: none;
 }
 
-.btn-outline-danger:hover {
-  background-color: #dc3545;
-  color: white;
+.text-muted a:hover {
+  text-decoration: underline;
 }
 
+/* כפתורי הורדה */
+.btn-light {
+  background-color: #fff;
+  border-color: #ddd;
+}
 
+.btn-light:hover {
+  background-color: #f7f7f7;
+}
+
+/* אנימציה למעבר */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+.modal-body .btn {
+  font-size: 1rem;
+  padding: 10px;
+}
+
+/* מיקום */
+.container {
+  max-width: 450px;
+}
