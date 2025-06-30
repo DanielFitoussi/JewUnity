@@ -267,6 +267,36 @@ const getGroupById = async (req, res) => {
   }
 };
 
+const leaveGroup = async (req, res) => {
+  const { groupId } = req.body;
+  const userId = req.user.userId;
+
+  try {
+    const group = await Group.findById(groupId);
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found' });
+    }
+
+    if (group.owner.toString() === userId) {
+      return res.status(400).json({ error: 'Owner cannot leave their own group' });
+    }
+
+    const initialCount = group.members.length;
+    group.members = group.members.filter(m => m.userId.toString() !== userId);
+
+    if (group.members.length === initialCount) {
+      return res.status(400).json({ error: 'User is not a member of this group' });
+    }
+
+    await group.save();
+    res.status(200).json({ message: 'Left group successfully' });
+  } catch (err) {
+    console.error('❌ Error in leaveGroup:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
 
 
 
@@ -282,5 +312,6 @@ module.exports = {
   updateGroup,
   getAllGroups,
   getGroupPosts,
-  getGroupById
+  getGroupById,
+  leaveGroup
 };

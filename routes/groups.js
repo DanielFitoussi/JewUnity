@@ -8,6 +8,9 @@ router.post('/', authenticateToken, groupController.createGroup);
 // הוספת חבר לקבוצה
 router.post('/add-member', authenticateToken, groupController.addMemberToGroup);
 
+router.post('/leave', authenticateToken, groupController.leaveGroup);
+
+
 // חיפוש קבוצות לפי שם/תיאור
 router.get('/search', authenticateToken, groupController.searchGroups);
 
@@ -20,6 +23,8 @@ router.get('/:groupId', authenticateToken, groupController.getGroupById); // ✅
 router.get('/:groupId/stats', authenticateToken, groupController.getGroupStats);
 // סטטיסטיקות מתקדמות לקבוצה
 router.get('/:groupId/advanced-stats', authenticateToken, groupController.getAdvancedGroupStats);
+
+
 
 
 
