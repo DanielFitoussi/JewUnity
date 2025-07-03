@@ -1,3 +1,4 @@
+require('dotenv').config(); // ← טוען את המפתחות מתוך .env
 const express = require('express')
 const app = express()
 const connectDB = require('./config/db')
@@ -26,9 +27,15 @@ app.use('/uploads', express.static('uploads'));
 
 
 
+
 app.get('/api', (req, res) => {
   res.send('API is alive');
 });
+
+app.get('/api/weather-key', (req, res) => {
+  res.json({ apiKey: process.env.OPENWEATHER_API_KEY });
+});
+
 
 
 

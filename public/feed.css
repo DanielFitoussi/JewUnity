@@ -156,3 +156,26 @@ a {
   margin: 5px 0;
 }
 
+.page-layout {
+  display: flex;
+  gap: 30px;
+}
+
+.main-content {
+  flex: 3;
+  min-width: 0;
+}
+
+.sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .page-layout {
+    flex-direction: column;
+  }
+}
+

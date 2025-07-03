@@ -22,21 +22,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const postsContainer = document.getElementById('postsContainer');
   const userId = parseJwt(token).userId;
 
-  async function fetchWeather() {
+ async function fetchWeather() {
   try {
-    const apiKey = '352bb4ed7e0826225c853daef16ba4a8';
+    // שלב 1: בקשת המפתח מהשרת
+    const keyResponse = await fetch('/api/weather-key');
+    const keyData = await keyResponse.json();
+    const apiKey = keyData.apiKey;
+
+    // שלב 2: בקשת מזג האוויר לפי המפתח שהתקבל
     const city = 'Tel Aviv';
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}&lang=he`;
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}&lang=he`
+    );
 
-    console.log('📡 שולח בקשה ל:', url);
-
-    const response = await fetch(url);
     const data = await response.json();
 
-    console.log('📦 תגובה שהתקבלה:', data);
-
     if (!data.main || !data.weather) {
-      throw new Error(`API returned error: ${data.message || 'unknown error'}`);
+      throw new Error(`API error: ${data.message}`);
     }
 
     const weatherDiv = document.getElementById('weatherInfo');
@@ -50,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
   } catch (err) {
     document.getElementById('weatherInfo').innerText = 'שגיאה בטעינת מזג האוויר';
-    console.error('❌ שגיאה בפונקציית fetchWeather:', err);
+    console.error('שגיאה ב-fetchWeather:', err);
   }
 }
 
