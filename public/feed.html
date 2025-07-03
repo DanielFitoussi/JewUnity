@@ -21,6 +21,10 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
+            <a class="nav-link" href="groups.html">קבוצות</a>
+          </li>
+
+          <li class="nav-item">
             <a class="nav-link" href="login.html">Logout</a>
           </li>
         </ul>
@@ -41,20 +45,7 @@
       </form>
     </section>
 
-    <section class="card p-3 mb-4">
-      <h5>צור קבוצה חדשה</h5>
-      <form id="createGroupForm">
-        <input type="text" id="groupName" class="form-control mb-2" placeholder="שם קבוצה" required>
-        <input type="text" id="groupDescription" class="form-control mb-2" placeholder="תיאור (לא חובה)">
-        <button type="submit" class="btn btn-success">צור קבוצה</button>
-      </form>
-    </section>
-
-    <section class="card p-3 mb-4">
-      <button id="toggleGroupListBtn" class="btn btn-secondary mb-2">הצג קבוצות</button>
-      <input id="groupSearchInput" type="text" class="form-control mb-2" placeholder="חפש קבוצה לפי שם או תיאור...">
-      <ul id="groupList" class="list-group d-none"></ul>
-    </section>
+  
 
     <div class="dropdown text-end mb-3">
       <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -70,17 +61,24 @@
 
     <div id="postsContainer"></div>
 
+    
+ 
     <section class="mt-5">
-  <div class="charts-container">
-    <div class="chart-box">
-      <h5 class="fw-bold mb-3 text-center">פוסטים לפי קבוצה</h5>
-      <svg id="postsPerGroupChart" width="400" height="300"></svg>
-    </div>
-    <div class="chart-box">
-      <h5 class="fw-bold mb-3 text-center">סוגי הפוסטים במערכת</h5>
-      <svg id="postMediaTypeChart" width="300" height="300"></svg>
-    </div>
-  </div>
+      <div class="charts-container">
+        <div class="chart-box">
+          <h5 class="fw-bold mb-3 text-center">פוסטים לפי קבוצה</h5>
+          <svg id="postsPerGroupChart" width="400" height="300"></svg>
+        </div>
+        <div class="chart-box">
+          <h5 class="fw-bold mb-3 text-center">סוגי הפוסטים במערכת</h5>
+          <svg id="postMediaTypeChart" width="300" height="300"></svg>
+        </div>
+      </div>
+    </section>
+
+    <section id="weatherSection" class="weather-box">
+  <h3>מזג האוויר בתל אביב</h3>
+  <div id="weatherInfo">טוען...</div>
 </section>
 
   </main>

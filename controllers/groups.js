@@ -24,12 +24,12 @@ const createGroup = async (req, res) => {
       return res.status(409).json({ error: 'Group name already exists' });
     }
 
-   const newGroup = new Group({
-  name,
-  description,
-  owner: req.user.userId,
-  members: [{ userId: req.user.userId, status: 'active' }]
-});
+    const newGroup = new Group({
+      name,
+      description,
+      owner: req.user.userId,
+      members: [{ userId: req.user.userId, status: 'active' }]
+    });
 
 
     await newGroup.save();
@@ -74,13 +74,13 @@ const searchGroups = async (req, res) => {
 
   try {
     // אם לא נשלח שום פרמטר חיפוש, נחזיר את כל הקבוצות
-    const groups = query 
+    const groups = query
       ? await Group.find({
-          $or: [
-            { name: { $regex: query, $options: 'i' } },  // חיפוש שם הקבוצה
-            { description: { $regex: query, $options: 'i' } }  // חיפוש תיאור הקבוצה
-          ]
-        })
+        $or: [
+          { name: { $regex: query, $options: 'i' } },  // חיפוש שם הקבוצה
+          { description: { $regex: query, $options: 'i' } }  // חיפוש תיאור הקבוצה
+        ]
+      })
       : await Group.find();
 
     res.status(200).json(groups);
@@ -247,18 +247,24 @@ const getGroupById = async (req, res) => {
   const { groupId } = req.params;
 
   try {
-    const group = await Group.findById(groupId);
+    const group = await Group.findById(groupId).populate('members.userId', 'username');
+
+
     if (!group) {
       return res.status(404).json({ error: 'Group not found' });
     }
 
     const groupWithAdmin = {
-      _id: group._id,
-      name: group.name,
-      description: group.description,
-      members: group.members.map(m => m.userId.toString()),
-      adminId: group.owner.toString()  // ✅ כאן הוספנו את adminId = owner
-    };
+  _id: group._id,
+  name: group.name,
+  description: group.description,
+  members: group.members.map(m => ({
+    _id: m.userId?._id,
+    username: m.userId?.username || 'משתמש לא ידוע'
+  })),
+  adminId: group.owner.toString()
+};
+
 
     res.status(200).json(groupWithAdmin);
   } catch (err) {
@@ -266,6 +272,7 @@ const getGroupById = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 const leaveGroup = async (req, res) => {
   const { groupId } = req.body;

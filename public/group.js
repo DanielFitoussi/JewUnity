@@ -50,7 +50,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log("👤 userId:", userId);
         console.log("👥 חברים בקבוצה:", group.members.map(m => String(m.userId)));
 
-        const isMember = group.members.some(id => id.toString() === userId.toString());
+       const isMember = group.members.some(m => m._id?.toString() === userId.toString());
+
         const isAdmin = String(group.adminId) === String(userId);
 
         console.log("🧪 בדיקת isMember:", isMember);
@@ -58,12 +59,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!isMember) {
             alert('רק חברי קבוצה יכולים לגשת לעמוד זה');
-            window.location.href = 'feed.html';
+            window.location.href = 'groups.html';
             return;
         }
 
         groupTitle.textContent = group.name;
         groupDescription.textContent = group.description;
+
+        
 
         if (isMember) {
             postFormSection.classList.remove('hidden');

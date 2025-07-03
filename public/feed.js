@@ -8,17 +8,53 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  loadGroups();
+
 
   renderPostsPerGroupChart(token);
 
   renderMediaTypeChart(token);
+
+   fetchWeather();
 
 
   const API_BASE_URL = 'http://localhost:3005/api/posts';
   const postForm = document.getElementById('postForm');
   const postsContainer = document.getElementById('postsContainer');
   const userId = parseJwt(token).userId;
+
+  async function fetchWeather() {
+  try {
+    const apiKey = '352bb4ed7e0826225c853daef16ba4a8';
+    const city = 'Tel Aviv';
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}&lang=he`;
+
+    console.log('📡 שולח בקשה ל:', url);
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    console.log('📦 תגובה שהתקבלה:', data);
+
+    if (!data.main || !data.weather) {
+      throw new Error(`API returned error: ${data.message || 'unknown error'}`);
+    }
+
+    const weatherDiv = document.getElementById('weatherInfo');
+    const temp = data.main.temp;
+    const desc = data.weather[0].description;
+
+    weatherDiv.innerHTML = `
+      <p><strong>${city}</strong></p>
+      <p>🌡️ טמפרטורה: ${temp}°C</p>
+      <p>🌤️ ${desc}</p>
+    `;
+  } catch (err) {
+    document.getElementById('weatherInfo').innerText = 'שגיאה בטעינת מזג האוויר';
+    console.error('❌ שגיאה בפונקציית fetchWeather:', err);
+  }
+}
+
+
 
   async function loadPosts() {
     try {
@@ -28,11 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const posts = await response.json();
 
+// ניקוי תצוגה קודם
+postsContainer.innerHTML = '';
+
 // סינון פוסטים שלא שייכים לקבוצה
 const filteredPosts = posts.filter(post => !post.groupId);
-
-// ניקוי תצוגה
-postsContainer.innerHTML = '';
 
 // הצגת הפוסטים הרלוונטיים
 filteredPosts.reverse().forEach(post => renderPost(post));
@@ -41,46 +77,6 @@ filteredPosts.reverse().forEach(post => renderPost(post));
       console.error('Failed to load posts:', err);
     }
   }
-
-
-
-
-
-
-  document.getElementById('createGroupForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById('groupName').value.trim();
-    const description = document.getElementById('groupDescription').value.trim();
-
-    if (!name) return alert('יש למלא שם קבוצה');
-
-    try {
-      const response = await fetch('http://localhost:3005/api/groups', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ name, description })
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        return alert(result.error || 'שגיאה ביצירת קבוצה');
-      }
-
-      alert('✅ הקבוצה נוצרה בהצלחה');
-      document.getElementById('createGroupForm').reset();
-      loadGroups(); // רענון הרשימה
-
-    } catch (err) {
-      console.error('שגיאה ביצירת קבוצה:', err);
-      alert('שגיאה בשרת');
-    }
-  });
-
 
 
 
@@ -432,16 +428,6 @@ async function updatePostContent(postId, newContent, postElement) {
 const toggleGroupListBtn = document.getElementById('toggleGroupListBtn');
 const groupList = document.getElementById('groupList');
 
-toggleGroupListBtn.addEventListener('click', () => {
-  groupList.classList.toggle('d-none');
-  toggleGroupListBtn.textContent = groupList.classList.contains('d-none') ? 'הצג קבוצות' : 'הסתר קבוצות';
-});
-
-
-
-
-
-
 
 async function renderPostsPerGroupChart(token) {
   try {
@@ -596,233 +582,7 @@ async function searchPosts(query) {
   }
 }
 
-async function loadGroups() {
-  try {
-    const response = await fetch('http://localhost:3005/api/groups', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
 
-    const groups = await response.json();
-    const userId = parseJwt(token).userId;
-
-    const listContainer = document.getElementById('groupList');
-    listContainer.innerHTML = '';
-
-    groups.forEach(group => {
-      const li = document.createElement('li');
-      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
-
-      const link = document.createElement('a');
-      link.href = `group.html?groupId=${group._id}`;
-      link.textContent = group.name;
-      link.style.textDecoration = 'none';
-      link.style.fontWeight = 'bold';
-
-      const desc = document.createElement('span');
-      desc.textContent = ` - ${group.description || 'ללא תיאור'}`;
-
-      const text = document.createElement('span');
-      text.appendChild(link);
-      text.appendChild(desc);
-
-      li.appendChild(text);
-
-
-      const actions = document.createElement('div');
-
-      // אם המשתמש הוא הבעלים
-      if (group.owner === userId) {
-        const editBtn = document.createElement('button');
-        editBtn.textContent = 'ערוך';
-        editBtn.classList.add('btn', 'btn-sm', 'btn-warning', 'ms-2');
-        editBtn.addEventListener('click', () => showEditGroupForm(group));
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'מחק';
-        deleteBtn.classList.add('btn', 'btn-sm', 'btn-danger');
-        deleteBtn.addEventListener('click', () => deleteGroup(group._id));
-
-        actions.appendChild(editBtn);
-        actions.appendChild(deleteBtn);
-      } else {
-        // אם המשתמש לא הבעלים ולא חבר בקבוצה → מציע להצטרף
-        const isMember = group.members.some(m => m.userId === userId);
-        if (!isMember) {
-          const joinBtn = document.createElement('button');
-          joinBtn.textContent = 'הצטרף';
-          joinBtn.classList.add('btn', 'btn-sm', 'btn-outline-primary');
-          joinBtn.addEventListener('click', () => joinGroup(group._id));
-          actions.appendChild(joinBtn);
-        }
-      }
-
-      li.appendChild(actions);
-      listContainer.appendChild(li);
-    });
-
-  } catch (err) {
-    console.error('❌ שגיאה בטעינת קבוצות:', err);
-  }
-}
-
-
-document.getElementById('groupSearchInput').addEventListener('input', async function () {
-  const query = this.value.trim();
-
-  if (query === '') {
-    loadGroups(); // טען את כל הקבוצות מחדש אם אין חיפוש
-    return;
-  }
-
-  try {
-    const response = await fetch(`http://localhost:3005/api/groups/search?query=${encodeURIComponent(query)}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    const groups = await response.json();
-    const listContainer = document.getElementById('groupList');
-    listContainer.innerHTML = '';
-
-    const userId = parseJwt(token).userId;
-
-    groups.forEach(group => {
-      const li = document.createElement('li');
-      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
-
-      const link = document.createElement('a');
-      link.href = `group.html?groupId=${group._id}`;
-      link.textContent = group.name;
-      link.style.textDecoration = 'none';
-      link.style.fontWeight = 'bold';
-      link.style.color = 'inherit';
-
-      const desc = document.createElement('span');
-      desc.textContent = ` - ${group.description || 'ללא תיאור'}`;
-
-      const text = document.createElement('span');
-      text.appendChild(link);
-      text.appendChild(desc);
-
-      li.appendChild(text);
-
-
-      const actions = document.createElement('div');
-
-      if (group.owner === userId) {
-        const editBtn = document.createElement('button');
-        editBtn.textContent = 'ערוך';
-        editBtn.classList.add('btn', 'btn-sm', 'btn-warning', 'ms-2');
-        editBtn.addEventListener('click', () => showEditGroupForm(group));
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'מחק';
-        deleteBtn.classList.add('btn', 'btn-sm', 'btn-danger');
-        deleteBtn.addEventListener('click', () => deleteGroup(group._id));
-
-        actions.appendChild(editBtn);
-        actions.appendChild(deleteBtn);
-      } else {
-        const isMember = group.members.some(m => m.userId === userId);
-        if (!isMember) {
-          const joinBtn = document.createElement('button');
-          joinBtn.textContent = 'הצטרף';
-          joinBtn.classList.add('btn', 'btn-sm', 'btn-outline-primary');
-          joinBtn.addEventListener('click', () => joinGroup(group._id));
-          actions.appendChild(joinBtn);
-        }
-      }
-
-      li.appendChild(actions);
-      listContainer.appendChild(li);
-    });
-
-  } catch (err) {
-    console.error('❌ שגיאה בחיפוש קבוצות:', err);
-  }
-});
-
-
-async function deleteGroup(groupId) {
-  if (!confirm('האם אתה בטוח שברצונך למחוק את הקבוצה?')) return;
-
-  try {
-    const response = await fetch(`http://localhost:3005/api/groups/${groupId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    const result = await response.json();
-
-    if (response.ok) {
-      alert('✅ הקבוצה נמחקה');
-      loadGroups();
-    } else {
-      alert(result.error || 'שגיאה במחיקה');
-    }
-  } catch (err) {
-    console.error('❌ שגיאה במחיקת קבוצה:', err);
-  }
-}
-
-function showEditGroupForm(group) {
-  const name = prompt('שם חדש לקבוצה:', group.name);
-  if (!name) return;
-
-  const description = prompt('תיאור חדש:', group.description || '');
-  if (description === null) return;
-
-  updateGroup(group._id, name, description);
-}
-
-async function updateGroup(groupId, name, description) {
-  try {
-    const response = await fetch(`http://localhost:3005/api/groups/${groupId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ name, description })
-    });
-
-    const result = await response.json();
-
-    if (response.ok) {
-      alert('✅ הקבוצה עודכנה בהצלחה');
-      loadGroups();
-    } else {
-      alert(result.error || 'שגיאה בעדכון');
-    }
-  } catch (err) {
-    console.error('❌ שגיאה בעדכון קבוצה:', err);
-  }
-}
-
-async function joinGroup(groupId) {
-  try {
-    const response = await fetch('http://localhost:3005/api/groups/add-member', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ groupId, userId: parseJwt(token).userId })
-    });
-
-    const result = await response.json();
-
-    if (response.ok) {
-      alert('✅ הצטרפת לקבוצה בהצלחה');
-      loadGroups();
-    } else {
-      alert(result.error || 'שגיאה בהצטרפות');
-    }
-  } catch (err) {
-    console.error('❌ שגיאה בהצטרפות לקבוצה:', err);
-  }
-}
 
 
 
