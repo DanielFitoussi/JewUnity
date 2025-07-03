@@ -25,6 +25,11 @@
           </li>
 
           <li class="nav-item">
+            <a class="nav-link" href="map.html">מפה</a>
+          </li>
+
+
+          <li class="nav-item">
             <a class="nav-link" href="login.html">Logout</a>
           </li>
         </ul>
@@ -32,52 +37,52 @@
     </div>
   </nav>
 
- <div class="page-layout container mt-4">
-  <main class="main-content">
-    <div class="mb-3">
-      <input type="text" id="searchInput" class="form-control" placeholder="חפש פוסטים לפי תוכן או שם משתמש...">
-    </div>
+  <div class="page-layout container mt-4">
+    <main class="main-content">
+      <div class="mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="חפש פוסטים לפי תוכן או שם משתמש...">
+      </div>
 
-    <section class="card p-3 mb-4">
-      <form id="postForm" enctype="multipart/form-data">
-        <textarea id="postContent" class="form-control mb-2" placeholder="מה חדש?" rows="3" required></textarea>
-        <input type="file" id="postImage" name="media" class="form-control mb-2" accept="image/*,video/*">
-        <button type="submit" class="btn btn-primary w-100">פרסם</button>
-      </form>
-    </section>
+      <section class="card p-3 mb-4">
+        <form id="postForm" enctype="multipart/form-data">
+          <textarea id="postContent" class="form-control mb-2" placeholder="מה חדש?" rows="3" required></textarea>
+          <input type="file" id="postImage" name="media" class="form-control mb-2" accept="image/*,video/*">
+          <button type="submit" class="btn btn-primary w-100">פרסם</button>
+        </form>
+      </section>
 
-    <div class="dropdown text-end mb-3">
-      <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-        סינון פוסטים
-      </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item filter-option" data-filter="all" href="#">הצג הכל</a></li>
-        <li><a class="dropdown-item filter-option" data-filter="text" href="#">טקסט בלבד</a></li>
-        <li><a class="dropdown-item filter-option" data-filter="image" href="#">תמונות בלבד</a></li>
-        <li><a class="dropdown-item filter-option" data-filter="video" href="#">וידאו בלבד</a></li>
-      </ul>
-    </div>
+      <div class="dropdown text-end mb-3">
+        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          סינון פוסטים
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item filter-option" data-filter="all" href="#">הצג הכל</a></li>
+          <li><a class="dropdown-item filter-option" data-filter="text" href="#">טקסט בלבד</a></li>
+          <li><a class="dropdown-item filter-option" data-filter="image" href="#">תמונות בלבד</a></li>
+          <li><a class="dropdown-item filter-option" data-filter="video" href="#">וידאו בלבד</a></li>
+        </ul>
+      </div>
 
-    <div id="postsContainer"></div>
-  </main>
+      <div id="postsContainer"></div>
+    </main>
 
-  <aside class="sidebar">
-    <section class="chart-box">
-      <h5 class="fw-bold mb-3 text-center">פוסטים לפי קבוצה</h5>
-      <svg id="postsPerGroupChart" width="400" height="300"></svg>
-    </section>
+    <aside class="sidebar">
+      <section class="chart-box">
+        <h5 class="fw-bold mb-3 text-center">פוסטים לפי קבוצה</h5>
+        <svg id="postsPerGroupChart" width="400" height="300"></svg>
+      </section>
 
-    <section class="chart-box">
-      <h5 class="fw-bold mb-3 text-center">סוגי הפוסטים במערכת</h5>
-      <svg id="postMediaTypeChart" width="300" height="300"></svg>
-    </section>
+      <section class="chart-box">
+        <h5 class="fw-bold mb-3 text-center">סוגי הפוסטים במערכת</h5>
+        <svg id="postMediaTypeChart" width="300" height="300"></svg>
+      </section>
 
-    <section id="weatherSection" class="weather-box">
-      <h3>מזג האוויר בתל אביב</h3>
-      <div id="weatherInfo">טוען...</div>
-    </section>
-  </aside>
-</div>
+      <section id="weatherSection" class="weather-box">
+        <h3>מזג האוויר בתל אביב</h3>
+        <div id="weatherInfo">טוען...</div>
+      </section>
+    </aside>
+  </div>
 
 
   <script src="feed.js"></script>

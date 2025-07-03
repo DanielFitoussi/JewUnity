@@ -1,0 +1,17 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f5f5;
+}
+
+.map-title {
+  text-align: center;
+  margin-top: 20px;
+  color: #333;
+}
+
+#map {
+  height: 90vh;
+  width: 100%;
+  border-top: 2px solid #ccc;
+}

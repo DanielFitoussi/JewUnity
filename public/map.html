@@ -4,41 +4,13 @@
   <meta charset="UTF-8">
   <title>מפת קבוצות</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>
-    #map {
-      height: 90vh;
-      width: 100%;
-    }
-  </style>
+  <link rel="stylesheet" href="map.css" />
 </head>
 <body>
-  <h2 style="text-align:center;">מפת קבוצות</h2>
+  <h2 class="map-title">מפת קבוצות</h2>
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script>
-    const map = L.map('map').setView([32.0853, 34.7818], 10); // תל אביב
-
-    // טען אריחים (tiles) מ־OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    // שלוף כתובות מהשרת
-    fetch('/api/groups/locations')
-      .then(res => res.json())
-      .then(groups => {
-        groups.forEach(group => {
-          if (group.location && group.location.lat && group.location.lng) {
-            L.marker([group.location.lat, group.location.lng])
-              .addTo(map)
-              .bindPopup(`<strong>${group.name}</strong>`);
-          }
-        });
-      })
-      .catch(err => {
-        console.error('שגיאה בטעינת מיקום קבוצות:', err);
-      });
-  </script>
+  <script src="map.js"></script>
 </body>
 </html>
