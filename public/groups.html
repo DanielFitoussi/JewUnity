@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
   <meta charset="UTF-8">
   <title>ניהול קבוצות</title>
@@ -7,6 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
   <link rel="stylesheet" href="feed.css">
 </head>
+
 <body class="bg-light">
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
@@ -24,6 +26,9 @@
       <form id="createGroupForm">
         <input type="text" id="groupName" class="form-control mb-2" placeholder="שם קבוצה" required>
         <input type="text" id="groupDescription" class="form-control mb-2" placeholder="תיאור (לא חובה)">
+        <input type="text" id="address" class="form-control mb-2"
+          placeholder="כתובת (עיר, מדינה) — למשל: Tel Aviv, Israel" required />
+
         <button type="submit" class="btn btn-success">צור קבוצה</button>
       </form>
     </section>
@@ -37,4 +42,5 @@
   <script src="groups.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

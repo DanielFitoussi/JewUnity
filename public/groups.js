@@ -13,8 +13,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const name = document.getElementById('groupName').value.trim();
     const description = document.getElementById('groupDescription').value.trim();
+    const address = document.getElementById('address').value.trim();
 
     if (!name) return alert('יש למלא שם קבוצה');
+    if (!address) return alert('יש למלא כתובת תקינה');
+
+    let location;
+    try {
+      const { lat, lng } = await getCoordinatesFromAddress(address); // שימוש ב־Nominatim של OpenStreetMap
+      location = {
+        type: 'Point',
+        coordinates: [lng, lat]
+      };
+    } catch (geoErr) {
+      console.error('❌ שגיאה בהמרת כתובת למיקום:', geoErr);
+      return alert('הכתובת שהוזנה לא נמצאה במפה');
+    }
 
     try {
       const response = await fetch('http://localhost:3005/api/groups', {
@@ -23,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ name, description })
+        body: JSON.stringify({ name, description, address, location })
       });
 
       const result = await response.json();
@@ -61,12 +75,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.getElementById('toggleGroupListBtn').addEventListener('click', () => {
-    const groupList = document.getElementById('groupList');
-    groupList.classList.toggle('d-none');
-    document.getElementById('toggleGroupListBtn').textContent = groupList.classList.contains('d-none') ? 'הצג קבוצות' : 'הסתר קבוצות';
-  });
+  const toggleBtn = document.getElementById('toggleGroupListBtn');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const groupList = document.getElementById('groupList');
+      groupList.classList.toggle('d-none');
+      toggleBtn.textContent = groupList.classList.contains('d-none') ? 'הצג קבוצות' : 'הסתר קבוצות';
+    });
+  }
 });
+
+async function getCoordinatesFromAddress(address) {
+  // שימוש ב־OpenStreetMap Nominatim API לגיאוקודינג
+  const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+  const data = await response.json();
+
+  if (data.length > 0) {
+    const location = data[0];
+    return { lat: location.lat, lng: location.lon };
+  } else {
+    throw new Error('כתובת לא נמצאה במפה');
+  }
+}
 
 function parseJwt(token) {
   const base64Url = token.split('.')[1];

@@ -11,10 +11,10 @@ const Post = require('../models/posts');
 
 
 const createGroup = async (req, res) => {
-  const { name, description } = req.body;
+  const { name, description, address, location } = req.body;
 
-  if (!name) {
-    return res.status(400).json({ error: 'Group name is required' });
+  if (!name || !address || !location || !location.coordinates) {
+    return res.status(400).json({ error: 'Missing required fields: name, address, or location' });
   }
 
   try {
@@ -27,19 +27,21 @@ const createGroup = async (req, res) => {
     const newGroup = new Group({
       name,
       description,
+      address,
+      location,
       owner: req.user.userId,
       members: [{ userId: req.user.userId, status: 'active' }]
     });
-
 
     await newGroup.save();
 
     res.status(201).json(newGroup);
   } catch (err) {
-    console.error(err);
+    console.error('❌ Error creating group:', err);
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 const addMemberToGroup = async (req, res) => {
   const { groupId, userId, status = 'active' } = req.body;

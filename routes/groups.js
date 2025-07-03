@@ -19,7 +19,10 @@ router.get('/search', authenticateToken, groupController.searchGroups);
 // שליפת קבוצות עם מיקומים (עבור המפה) ← ✨ הועבר למעלה לפני groupId
 router.get('/locations', async (req, res) => {
   try {
-    const groups = await Group.find({ location: { $exists: true } }, { name: 1, location: 1 });
+    const groups = await Group.find(
+      { location: { $exists: true } },
+      { _id: 1, name: 1, address: 1, location: 1 }
+    );
     res.json(groups);
   } catch (err) {
     console.error('❌ שגיאה בשליפת מיקומי קבוצות:', err);
