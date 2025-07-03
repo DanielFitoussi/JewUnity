@@ -24,6 +24,7 @@ app.use('/', testRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/posts', postsRoutes)
 app.use('/uploads', express.static('uploads'));
+app.use('/api/groups', require('./routes/groups'));
 
 
 

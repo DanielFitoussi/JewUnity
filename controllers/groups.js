@@ -304,6 +304,16 @@ const leaveGroup = async (req, res) => {
 };
 
 
+const getAllGroupLocations = async (req, res) => {
+  try {
+    const groups = await Group.find({}, 'name address'); // מחזיר רק שם וכתובת
+    res.status(200).json(groups);
+  } catch (err) {
+    console.error('❌ Error fetching group locations:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 
 
 
@@ -320,5 +330,6 @@ module.exports = {
   getAllGroups,
   getGroupPosts,
   getGroupById,
-  leaveGroup
+  leaveGroup,
+  getAllGroupLocations
 };
