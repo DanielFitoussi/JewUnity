@@ -86,17 +86,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function getCoordinatesFromAddress(address) {
-  // שימוש ב־OpenStreetMap Nominatim API לגיאוקודינג
   const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
   const data = await response.json();
 
   if (data.length > 0) {
     const location = data[0];
+    console.log('🎯 מיקום הכתובת:', location);  // הוסף את השורה הזו כדי לבדוק את התשובה
     return { lat: location.lat, lng: location.lon };
   } else {
     throw new Error('כתובת לא נמצאה במפה');
   }
 }
+
 
 function parseJwt(token) {
   const base64Url = token.split('.')[1];
@@ -179,25 +180,40 @@ function renderGroupList(groups) {
 async function joinGroup(groupId) {
   try {
     const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('❌ No token found in localStorage');
+      alert('אנא התחבר מחדש');
+      window.location.href = 'login.html';
+      return;
+    }
+
+    const userId = parseJwt(token).userId;
+    console.log('Token:', token);
+    console.log('User ID:', userId);
+    console.log('Group ID:', groupId);
+
     const response = await fetch('http://localhost:3005/api/groups/add-member', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ groupId, userId: parseJwt(token).userId })
+      body: JSON.stringify({ groupId, userId, status: 'active' })
     });
 
     const result = await response.json();
+    console.log('Response:', result);
 
     if (response.ok) {
       alert('✅ הצטרפת לקבוצה בהצלחה');
       loadGroups();
     } else {
+      console.error('Error from server:', result);
       alert(result.error || 'שגיאה בהצטרפות');
     }
   } catch (err) {
     console.error('❌ שגיאה בהצטרפות לקבוצה:', err);
+    alert('שגיאה בשרת');
   }
 }
 

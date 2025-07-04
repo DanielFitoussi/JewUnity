@@ -7,11 +7,12 @@ const Post = require('../models/posts');
 
 
 
-
-
-
 const createGroup = async (req, res) => {
   const { name, description, address, location } = req.body;
+  
+   // הוספת לוגים לבדוק את הכתובת והמיקום
+  console.log('📍 כתובת שהתקבלה:', address);
+  console.log('🌍 מיקום גיאוגרפי שהתקבל:', location);
 
   if (!name || !address || !location || !location.coordinates) {
     return res.status(400).json({ error: 'Missing required fields: name, address, or location' });
@@ -46,29 +47,42 @@ const createGroup = async (req, res) => {
 const addMemberToGroup = async (req, res) => {
   const { groupId, userId, status = 'active' } = req.body;
 
+  console.log('Received groupId:', groupId);
+  console.log('Received userId:', userId);
+
   try {
+    // שליפת הקבוצה
     const group = await Group.findById(groupId);
     if (!group) {
+      console.log('Group not found');
       return res.status(404).json({ error: 'Group not found' });
     }
 
+    console.log('Group found:', group);
+
+    // בדוק אם המשתמש כבר חבר בקבוצה
     const existingMember = group.members.find(
       member => member.userId.toString() === userId
     );
 
     if (existingMember) {
+      console.log('User is already a member');
       return res.status(400).json({ error: 'User is already a member' });
     }
 
+    // הוספת חבר חדש לקבוצה
     group.members.push({ userId, status });
     await group.save();
 
+    console.log('User added successfully');
     res.status(200).json({ message: 'User added to group successfully', group });
   } catch (err) {
-    console.error(err);
+    console.error('Error in addMemberToGroup:', err);
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+
 
 
 const searchGroups = async (req, res) => {

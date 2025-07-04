@@ -62,11 +62,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     const isMember = group.members.some(m => m._id?.toString() === userId.toString());
     const isAdmin = String(group.adminId) === String(userId);
 
-    if (!isMember) {
-      alert('רק חברי קבוצה יכולים לגשת לעמוד זה');
-      window.location.href = 'groups.html';
-      return;
+ if (!isMember) {
+  try {
+    const res = await fetch('http://localhost:3005/api/groups/add-member', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ groupId, userId })
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      alert('המשתמש הצטרף לקבוצה בהצלחה!');
+      window.location.reload(); // רענון העמוד אחרי ההצטרפות
+    } else {
+      alert(result.error || 'שגיאה בהצטרפות לקבוצה');
     }
+  } catch (err) {
+    console.error('שגיאה בהצטרפות לקבוצה:', err);
+    alert('שגיאה בהצטרפות לקבוצה');
+  }
+  return;
+}
+
 
     if (isMember) {
       postFormSection.classList.remove('hidden');
@@ -211,6 +231,77 @@ document.addEventListener('DOMContentLoaded', async () => {
       alert('שגיאה בעזיבה');
     }
   });
+  
+function renderPost(post) {
+  const postsContainer = document.getElementById('postsContainer');
+  const token = localStorage.getItem('token');
+  const userId = parseJwt(token).userId;
+
+  const postElement = document.createElement('div');
+  postElement.classList.add('post-card');
+
+  const fullName = post.author?.firstName && post.author?.lastName
+    ? `${post.author.firstName} ${post.author.lastName}`
+    : post.author?.username || 'משתמש לא ידוע';
+
+  const header = document.createElement('div');
+  header.className = 'd-flex justify-content-between align-items-center mb-2';
+  header.innerHTML = `
+    <strong>${fullName}</strong>
+    <small class="text-muted">${new Date(post.createdAt).toLocaleDateString()}</small>
+  `;
+
+  const content = document.createElement('p');
+  content.textContent = post.content;
+
+  postElement.appendChild(header);
+  postElement.appendChild(content);
+
+  // אם יש מדיה (תמונה/וידאו), נוסיף אותה לפוסט
+  if (post.mediaUrl && post.mediaType !== 'text') {
+    const media = document.createElement(post.mediaType === 'image' ? 'img' : 'video');
+    media.src = post.mediaUrl;
+    media.className = 'post-media';
+    if (post.mediaType === 'video') media.controls = true;
+    postElement.appendChild(media);
+  }
+
+  const actions = document.createElement('div');
+  actions.className = 'd-flex gap-3 align-items-center mt-2';
+
+  // כפתור לייק
+  const likeBtn = document.createElement('button');
+  likeBtn.className = 'btn-icon';
+  const likeIcon = document.createElement('i');
+  likeIcon.classList.add('bi');
+  likeIcon.classList.add(post.likedBy.includes(userId) ? 'bi-heart-fill' : 'bi-heart');
+  likeBtn.appendChild(likeIcon);
+
+  const likeCount = document.createElement('span');
+  likeCount.textContent = post.likedBy.length;
+
+  likeBtn.addEventListener('click', async () => {
+    try {
+      const res = await fetch(`http://localhost:3005/api/posts/${post._id}/like`, {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      likeCount.textContent = data.likes;
+      likeIcon.className = data.likedBy.includes(userId) ? 'bi bi-heart-fill liked' : 'bi bi-heart';
+    } catch (err) {
+      console.error('שגיאה בלייק:', err);
+    }
+  });
+
+  actions.appendChild(likeBtn);
+  actions.appendChild(likeCount);
+  postElement.appendChild(actions);
+
+  // הוסף את הפוסט בראש הרשימה
+  postsContainer.insertBefore(postElement, postsContainer.firstChild);
+}
+
 
   function renderPosts(posts) {
     postsContainer.innerHTML = '';

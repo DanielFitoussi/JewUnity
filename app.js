@@ -13,6 +13,7 @@ const groupRoutes = require('./routes/groups');
 
 
 const cors = require('cors');
+app.use(cors());  // מאפשר גישה בין פורטים שונים
 
 connectDB ();
 
@@ -24,6 +25,7 @@ app.use('/', testRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/posts', postsRoutes)
 app.use('/uploads', express.static('uploads'));
+
 
 
 

@@ -8,17 +8,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // שליפת מיקומי קבוצות מהשרת
   fetch('/api/groups/locations')
-    .then(res => res.json())
-    .then(groups => {
-      groups.forEach(group => {
-        if (group.location && group.location.lat && group.location.lng) {
-          L.marker([group.location.lat, group.location.lng])
-            .addTo(map)
-            .bindPopup(`<strong>${group.name}</strong>`);
-        }
-      });
-    })
-    .catch(err => {
-      console.error('שגיאה בטעינת מיקום קבוצות:', err);
+  .then(res => res.json())
+  .then(groups => {
+    groups.forEach(group => {
+      // אם ה־location קיים ויש לו את coordinates
+      if (group.location && group.location.coordinates) {
+        const lat = group.location.coordinates[1]; // קו רוחב
+        const lng = group.location.coordinates[0]; // קו אורך
+
+        // הצגת הסמן במפה
+        L.marker([lat, lng])
+          .addTo(map)
+          .bindPopup(`<strong>${group.name}</strong>`);
+      }
     });
+  })
+  .catch(err => {
+    console.error('שגיאה בטעינת מיקום קבוצות:', err);
+  });
+
 });
