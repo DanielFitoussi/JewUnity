@@ -60,7 +60,8 @@ async function loginUser(event) {
     }
 
     // אחסון הטוקן ב-localStorage
-    sessionStorage.setItem('token', data.token);
+    localStorage.setItem('token', data.token);
+
     window.location.href = 'feed.html'; // לדוגמה: ננתב לדף הפיד (בהמשך נבנה אותו)
   } catch (err) {
     console.error(err);

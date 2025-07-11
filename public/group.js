@@ -1,5 +1,7 @@
+// group.js
+
 document.addEventListener('DOMContentLoaded', async () => {
-const token = sessionStorage.getItem('token');
+  const token = localStorage.getItem('token')
   if (!token) {
     alert('עליך להתחבר כדי לגשת לעמוד');
     window.location.href = 'login.html';
@@ -34,59 +36,73 @@ const token = sessionStorage.getItem('token');
       headers: { Authorization: `Bearer ${token}` }
     });
     const group = await res.json();
+    
+    const userId = parseJwt(token).userId;
+    
 
-    // ✅ הצגת פרטים בסיסיים
+console.log('🧪 USER ID:', userId);                      // המשתמש המחובר
+console.log('🧪 GROUP MEMBERS:', group.members);          // כל חברי הקבוצה שהשרת החזיר
+console.log('🧪 isMember:', group.members.some(m => String(m._id) === String(userId)));
+
+
+    console.log('🔍 group.members:', group.members);
+    console.log('👤 current userId:', userId);
+
+const isMember = group.members.some(m => String(m.userId) === String(userId));
+    console.log('👀 isMember:', isMember);
+
+    const isAdmin = String(group.adminId) === String(userId);
+
+
     groupTitle.textContent = group.name;
     groupDescription.textContent = group.description;
     groupAddress.textContent = group.address || 'כתובת לא זמינה';
 
-    // ✅ הצגת המפה עם Leaflet
     if (group.location?.coordinates?.length === 2) {
       const [lng, lat] = group.location.coordinates;
-
-      // יצירת המפה
       const map = L.map('map').setView([lat, lng], 12);
-
-      // הוספת OpenStreetMap כטיילייר
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
-
-      // הוספת סימן (marker) לקבוצה
       L.marker([lat, lng])
         .addTo(map)
         .bindPopup(`<strong>${group.name}</strong><br>${group.address || ''}<br><a href="group.html?groupId=${group._id}">👀 צפה בקבוצה</a>`);
     }
 
-    const userId = parseJwt(token).userId;
-    const isMember = group.members.some(m => m._id?.toString() === userId.toString());
-    const isAdmin = String(group.adminId) === String(userId);
+    if (!isMember) {
+      const joinBtn = document.createElement('button');
+      joinBtn.textContent = 'הצטרף לקבוצה';
+      joinBtn.classList.add('btn', 'btn-sm', 'btn-outline-primary');
 
- if (!isMember) {
-  try {
-    const res = await fetch('http://localhost:3005/api/groups/add-member', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ groupId, userId })
-    });
+      joinBtn.addEventListener('click', async () => {
+        try {
+          const res = await fetch(`${API_BASE}/add-member`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ groupId, userId })
+          });
 
-    const result = await res.json();
-    if (res.ok) {
-      alert('המשתמש הצטרף לקבוצה בהצלחה!');
-      window.location.reload(); // רענון העמוד אחרי ההצטרפות
-    } else {
-      alert(result.error || 'שגיאה בהצטרפות לקבוצה');
+          const result = await res.json();
+          if (res.ok) {
+            alert('הצטרפת לקבוצה בהצלחה!');
+            window.location.reload();
+          } else {
+            alert(result.error || 'שגיאה בהצטרפות');
+          }
+        } catch (err) {
+          console.error('שגיאה בהצטרפות לקבוצה:', err);
+          alert('שגיאה בהצטרפות לקבוצה');
+        }
+      });
+
+      const actionsContainer = document.getElementById('actions-container');
+      if (actionsContainer) {
+        actionsContainer.appendChild(joinBtn);
+      }
     }
-  } catch (err) {
-    console.error('שגיאה בהצטרפות לקבוצה:', err);
-    alert('שגיאה בהצטרפות לקבוצה');
-  }
-  return;
-}
-
 
     if (isMember) {
       postFormSection.classList.remove('hidden');
@@ -97,9 +113,6 @@ const token = sessionStorage.getItem('token');
       editGroupBtn.classList.remove('hidden');
     }
 
- 
-
-    // ✨ עריכת קבוצה
     editGroupBtn.addEventListener('click', async () => {
       const newName = prompt('שם חדש לקבוצה:', groupTitle.textContent);
       if (!newName) return;
@@ -117,11 +130,7 @@ const token = sessionStorage.getItem('token');
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({
-            name: newName,
-            description: newDescription,
-            address: newAddress
-          })
+          body: JSON.stringify({ name: newName, description: newDescription, address: newAddress })
         });
 
         const result = await response.json();
@@ -139,12 +148,10 @@ const token = sessionStorage.getItem('token');
         alert('שגיאה בשרת');
       }
     });
-
   } catch (err) {
     console.error('שגיאה בטעינת הקבוצה:', err);
   }
 
-  // ✨ טעינת פוסטים
   async function loadGroupPosts() {
     try {
       const res = await fetch(`${API_BASE}/${groupId}/posts`, {
@@ -159,40 +166,45 @@ const token = sessionStorage.getItem('token');
   }
 
   postForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  const content = postContent.value.trim();
+  const media = mediaUpload.files[0];
 
-    const content = postContent.value.trim();
-    const media = mediaUpload.files[0];
+  // אם אין מדיה – דרוש מלל
+  if (!media) {
+    postContent.setAttribute('required', 'required');
+  } else {
+    postContent.removeAttribute('required');
+  }
 
-    if (!content && !media) {
-      alert('אנא כתוב משהו או צרף מדיה');
-      return;
-    }
+  // עצור שליחה אם הטופס לא תקין (ייתן את הודעת ברירת המחדל של הדפדפן)
+  if (!postForm.checkValidity()) {
+    return;
+  }
 
-    const formData = new FormData();
-    formData.append('content', content);
-    formData.append('groupId', groupId);
-    if (media) formData.append('media', media);
+  e.preventDefault();
 
-    try {
-      const res = await fetch('http://localhost:3005/api/posts', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: formData
-      });
+  const formData = new FormData();
+  formData.append('content', content);
+  formData.append('groupId', groupId);
+  if (media) formData.append('media', media);
 
-      if (!res.ok) throw new Error('שגיאה בפרסום הפוסט');
+  try {
+    const res = await fetch('http://localhost:3005/api/posts', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData
+    });
 
-      postContent.value = '';
-      mediaUpload.value = '';
-      await loadGroupPosts();
-    } catch (err) {
-      console.error('שגיאה בשליחת פוסט:', err);
-      alert('רק חברי הקבוצה רשאים לפרסם');
-    }
-  });
+    if (!res.ok) throw new Error('שגיאה בפרסום הפוסט');
+    postContent.value = '';
+    mediaUpload.value = '';
+    await loadGroupPosts();
+  } catch (err) {
+    console.error('שגיאה בשליחת פוסט:', err);
+    alert('רק חברי הקבוצה רשאים לפרסם');
+  }
+});
+
 
   searchInput?.addEventListener('input', () => {
     const keyword = searchInput.value.toLowerCase();
@@ -210,7 +222,7 @@ const token = sessionStorage.getItem('token');
     if (!confirm('האם אתה בטוח שברצונך לעזוב את הקבוצה?')) return;
 
     try {
-      const res = await fetch('http://localhost:3005/api/groups/leave', {
+      const res = await fetch(`${API_BASE}/leave`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -220,25 +232,21 @@ const token = sessionStorage.getItem('token');
       });
 
       const result = await res.json();
-
       if (!res.ok) {
         alert(result.error || 'שגיאה בעזיבת קבוצה');
         return;
       }
 
       alert('✨ עזבת את הקבוצה בהצלחה');
-      window.location.href = 'feed.html';
+      window.location.reload();
     } catch (err) {
       console.error('שגיאה בעזיבת קבוצה:', err);
       alert('שגיאה בעזיבה');
     }
   });
-  
-function renderPost(post) {
-  const postsContainer = document.getElementById('postsContainer');
-const token = sessionStorage.getItem('token');
-  const userId = parseJwt(token).userId;
 
+ function renderPost(post) {
+  const userId = parseJwt(localStorage.getItem('token')).userId;
   const postElement = document.createElement('div');
   postElement.classList.add('post-card');
 
@@ -259,7 +267,6 @@ const token = sessionStorage.getItem('token');
   postElement.appendChild(header);
   postElement.appendChild(content);
 
-  // אם יש מדיה (תמונה/וידאו), נוסיף אותה לפוסט
   if (post.mediaUrl && post.mediaType !== 'text') {
     const media = document.createElement(post.mediaType === 'image' ? 'img' : 'video');
     media.src = post.mediaUrl;
@@ -271,12 +278,17 @@ const token = sessionStorage.getItem('token');
   const actions = document.createElement('div');
   actions.className = 'd-flex gap-3 align-items-center mt-2';
 
-  // כפתור לייק
   const likeBtn = document.createElement('button');
   likeBtn.className = 'btn-icon';
+
   const likeIcon = document.createElement('i');
   likeIcon.classList.add('bi');
-  likeIcon.classList.add(post.likedBy.includes(userId) ? 'bi-heart-fill' : 'bi-heart');
+  if (post.likedBy.includes(userId)) {
+    likeIcon.classList.add('bi-heart-fill', 'liked');
+  } else {
+    likeIcon.classList.add('bi-heart');
+  }
+
   likeBtn.appendChild(likeIcon);
 
   const likeCount = document.createElement('span');
@@ -286,7 +298,7 @@ const token = sessionStorage.getItem('token');
     try {
       const res = await fetch(`http://localhost:3005/api/posts/${post._id}/like`, {
         method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       const data = await res.json();
       likeCount.textContent = data.likes;
@@ -299,8 +311,6 @@ const token = sessionStorage.getItem('token');
   actions.appendChild(likeBtn);
   actions.appendChild(likeCount);
   postElement.appendChild(actions);
-
-  // הוסף את הפוסט בראש הרשימה
   postsContainer.insertBefore(postElement, postsContainer.firstChild);
 }
 
@@ -313,7 +323,6 @@ const token = sessionStorage.getItem('token');
   loadGroupPosts();
 });
 
-// ✨ פונקציית פענוח טוקן
 function parseJwt(token) {
   try {
     const payload = token.split('.')[1];

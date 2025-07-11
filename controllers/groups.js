@@ -311,8 +311,14 @@ const leaveGroup = async (req, res) => {
       return res.status(400).json({ error: 'Owner cannot leave their own group' });
     }
 
+    // ✅ לפני הסינון – נציג את החברים הנוכחיים
+    console.log('👥 לפני הסינון:', group.members.map(m => m.userId.toString()));
+
     const initialCount = group.members.length;
     group.members = group.members.filter(m => m.userId.toString() !== userId);
+
+    // ✅ אחרי הסינון – נציג את הרשימה החדשה
+    console.log('👥 אחרי הסינון:', group.members.map(m => m.userId.toString()));
 
     if (group.members.length === initialCount) {
       return res.status(400).json({ error: 'User is not a member of this group' });
@@ -325,6 +331,7 @@ const leaveGroup = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 
 const getAllGroupLocations = async (req, res) => {

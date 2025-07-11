@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const token = sessionStorage.getItem('token');
+  const token = localStorage.getItem('token')
   if (!token) {
     alert('You must be logged in to access this page');
     window.location.href = 'login.html';
@@ -111,7 +111,7 @@ function parseJwt(token) {
 
 async function loadGroups() {
   try {
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token')
     const response = await fetch('http://localhost:3005/api/groups', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -133,7 +133,7 @@ async function loadGroups() {
 
 
 function renderGroupList(groups) {
-  const userId = parseJwt(localStorage.getItem('token')).userId;
+const userId = parseJwt(localStorage.getItem('token')).userId;
   const listContainer = document.getElementById('groupList');
   listContainer.innerHTML = '';
 
@@ -188,7 +188,7 @@ function renderGroupList(groups) {
 
 async function joinGroup(groupId) {
   try {
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token')
     if (!token) {
       console.error('❌ No token found in localStorage');
       alert('אנא התחבר מחדש');
@@ -238,7 +238,7 @@ function showEditGroupForm(group) {
 
 async function updateGroup(groupId, name, description) {
   try {
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token')
     const response = await fetch(`http://localhost:3005/api/groups/${groupId}`, {
       method: 'PATCH',
       headers: {
@@ -265,7 +265,7 @@ async function deleteGroup(groupId) {
   if (!confirm('האם אתה בטוח שברצונך למחוק את הקבוצה?')) return;
 
   try {
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token')
     const response = await fetch(`http://localhost:3005/api/groups/${groupId}`, {
       method: 'DELETE',
       headers: {

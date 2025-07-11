@@ -1,7 +1,7 @@
 let token = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-token = sessionStorage.getItem('token');
+token = localStorage.getItem('token')
   if (!token) {
     alert('You must be logged in to access the feed');
     window.location.href = 'login.html';
@@ -149,7 +149,7 @@ function parseJwt(token) {
 
 function renderPost(post) {
   const postsContainer = document.getElementById('postsContainer');
-const token = sessionStorage.getItem('token');
+const token = localStorage.getItem('token')
   const userId = parseJwt(token).userId;
 
   console.log("📩 מציג פוסט:", post);
