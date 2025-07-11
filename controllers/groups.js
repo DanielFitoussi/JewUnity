@@ -197,9 +197,10 @@ const updateGroup = async (req, res) => {
       return res.status(404).json({ error: 'Group not found' });
     }
 
-    if (group.owner.toString() !== req.user.userId) {
-      return res.status(403).json({ error: 'You are not authorized to update this group' });
-    }
+    if (group.owner.toString() !== req.user.userId.toString()) {
+  return res.status(403).json({ error: 'You are not authorized to update this group' });
+}
+
 
     if (name) group.name = name;
     if (description) group.description = description;
@@ -239,13 +240,15 @@ const deleteGroup = async (req, res) => {
 
 const getAllGroups = async (req, res) => {
   try {
-    const groups = await Group.find();
+    const groups = await Group.find().populate('members.userId', 'username');
     res.status(200).json(groups);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch groups' });
   }
 };
+
+
 
 const getGroupPosts = async (req, res) => {
   const { groupId } = req.params;
@@ -270,16 +273,20 @@ const getGroupById = async (req, res) => {
       return res.status(404).json({ error: 'Group not found' });
     }
 
-    const groupWithAdmin = {
+const groupWithAdmin = {
   _id: group._id,
   name: group.name,
   description: group.description,
+  address: group.address,
+  location: group.location, // ✅ הוספת מיקום!
   members: group.members.map(m => ({
     _id: m.userId?._id,
     username: m.userId?.username || 'משתמש לא ידוע'
   })),
   adminId: group.owner.toString()
 };
+
+
 
 
     res.status(200).json(groupWithAdmin);

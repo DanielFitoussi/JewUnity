@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  const token = localStorage.getItem('token');
+const token = sessionStorage.getItem('token');
   if (!token) {
     alert('עליך להתחבר כדי לגשת לעמוד');
     window.location.href = 'login.html';
@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
 function renderPost(post) {
   const postsContainer = document.getElementById('postsContainer');
-  const token = localStorage.getItem('token');
+const token = sessionStorage.getItem('token');
   const userId = parseJwt(token).userId;
 
   const postElement = document.createElement('div');
