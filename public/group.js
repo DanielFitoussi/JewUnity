@@ -97,6 +97,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       editGroupBtn.classList.remove('hidden');
     }
 
+ 
+
     // ✨ עריכת קבוצה
     editGroupBtn.addEventListener('click', async () => {
       const newName = prompt('שם חדש לקבוצה:', groupTitle.textContent);
