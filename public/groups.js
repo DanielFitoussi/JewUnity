@@ -141,17 +141,26 @@ const userId = parseJwt(localStorage.getItem('token')).userId;
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
 
-    const link = document.createElement('a');
-    link.href = `group.html?groupId=${group._id}`;
-    link.textContent = group.name;
-    link.style.textDecoration = 'none';
-    link.style.fontWeight = 'bold';
+    let nameElement;
+const isMember = group.members.some(m => m.userId && m.userId._id === userId);
+
+if (isMember) {
+  nameElement = document.createElement('a');
+  nameElement.href = `group.html?groupId=${group._id}`;
+  nameElement.style.textDecoration = 'none';
+  nameElement.style.fontWeight = 'bold';
+  nameElement.textContent = group.name;
+} else {
+  nameElement = document.createElement('span');
+  nameElement.style.fontWeight = 'bold';
+  nameElement.textContent = group.name;
+}
 
     const desc = document.createElement('span');
     desc.textContent = ` - ${group.description || 'ללא תיאור'}`;
 
     const text = document.createElement('span');
-    text.appendChild(link);
+text.appendChild(nameElement); // ✅ הקישור או הטקסט
     text.appendChild(desc);
 
     li.appendChild(text);

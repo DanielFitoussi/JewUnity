@@ -490,9 +490,10 @@ async function renderPostsPerGroupChart(token) {
     const svg = d3.select("#postsPerGroupChart");
     svg.selectAll("*").remove(); // ניקוי קודם
 
+    // 🟢 הגדל גובה לגרף ותחתית
     const width = +svg.attr("width") || 600;
-    const height = +svg.attr("height") || 400;
-    const margin = { top: 20, right: 30, bottom: 60, left: 50 };
+    const height = +svg.attr("height") || 450; // במקום 400
+    const margin = { top: 20, right: 30, bottom: 90, left: 50 }; // bottom מוגדל ל־90
 
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
@@ -510,18 +511,17 @@ async function renderPostsPerGroupChart(token) {
       .nice()
       .range([chartHeight, 0]);
 
-    chart.append("g")
-      .call(d3.axisLeft(y));
+    chart.append("g").call(d3.axisLeft(y));
 
     chart.append("g")
       .attr("transform", `translate(0,${chartHeight})`)
       .call(d3.axisBottom(x))
       .selectAll("text")
-      .attr("transform", "rotate(30)")
-      .style("text-anchor", "start")
-      .attr("dx", "0.5em")
+      .attr("transform", "rotate(45)") // זווית מתונה
+      .style("text-anchor", "end")
+      .attr("dx", "-0.6em")
       .attr("dy", "0.25em")
-      .style("font-size", "12px");
+      .style("font-size", "13px"); // פונט ברור
 
     chart.selectAll("rect")
       .data(data)
@@ -541,11 +541,13 @@ async function renderPostsPerGroupChart(token) {
       .attr("x", d => x(d.groupName) + x.bandwidth() / 2)
       .attr("y", d => y(d.postsCount) - 5)
       .attr("text-anchor", "middle")
+      .style("font-size", "14px")
       .text(d => d.postsCount);
   } catch (err) {
     console.error("❌ Failed to load posts per group chart:", err);
   }
 }
+
 
 
 async function renderMediaTypeChart(token) {
