@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-
+ // ✅ הסתרת לשונית החברים כברירת מחדל
+  document.getElementById('friendsPanel').style.display = 'none';
 
   renderPostsPerGroupChart(token);
 

@@ -162,7 +162,8 @@ const acceptFriendRequest = async (req, res) => {
 
 const getFriends = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).populate('friends', 'username');
+    const user = await User.findById(req.user.userId).populate('friends', 'firstName lastName username')
+
     res.json(user.friends);
   } catch (err) {
     res.status(500).json({ error: 'שגיאה בשליפת חברים' });
