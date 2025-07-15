@@ -1,6 +1,7 @@
 const Post = require('../models/posts');
 const mongoose = require('mongoose');
 const Group = require('../models/groups');
+const User = require('../models/user');
 
 // שליפת כל הפוסטים
 const getPosts = async (req, res) => {
@@ -240,6 +241,29 @@ const searchPosts = async (req, res) => {
   }
 };
 
+const getFriendsFeed = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    // שליפת רשימת חברים
+    const user = await User.findById(userId).populate('friends');
+    const friendIds = user.friends.map(friend => friend._id);
+
+    // הוספת המשתמש עצמו
+    friendIds.push(userId);
+
+    // שליפת הפוסטים של המשתמש והחברים
+    const posts = await Post.find({ 'author': { $in: friendIds } })
+      .sort({ createdAt: -1 })
+      .populate('author', 'username');
+
+    res.json(posts);
+  } catch (err) {
+    console.error('❌ שגיאה בטעינת פיד החברים:', err);
+    res.status(500).json({ error: 'שגיאה בטעינת הפיד' });
+  }
+};
+
 module.exports = {
   getPosts,
   createPost,
@@ -253,5 +277,6 @@ module.exports = {
   likePost,
   addComment,
   getPostCountsByMediaType,
-  searchPosts
+  searchPosts,
+  getFriendsFeed
 };

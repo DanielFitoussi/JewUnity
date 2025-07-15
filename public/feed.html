@@ -1,16 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Feed</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="feed.css">
   <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
-
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
     <div class="container-fluid">
@@ -19,16 +17,16 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav ms-auto align-items-center">
           <li class="nav-item">
             <a class="nav-link" href="groups.html">קבוצות</a>
           </li>
-
           <li class="nav-item">
             <a class="nav-link" href="map.html">מפה</a>
           </li>
-
-
+          <li class="nav-item">
+            <button id="showFriendsBtn" class="btn btn-outline-light btn-sm ms-2"> חברים</button>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="login.html">Logout</a>
           </li>
@@ -37,6 +35,20 @@
     </div>
   </nav>
 
+  <!-- לוח חברים (מוסתר כברירת מחדל) -->
+  <div id="friendsPanel" class="friends-panel">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>רשימת החברים שלך</strong>
+        <button class="btn-close" aria-label="Close" id="closeFriendsPanel"></button>
+      </div>
+      <ul class="list-group list-group-flush" id="friendsList">
+        <!-- נטען דינמית -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- תוכן עמוד רגיל -->
   <div class="page-layout container mt-4">
     <main class="main-content">
       <div class="mb-3">
@@ -84,9 +96,7 @@
     </aside>
   </div>
 
-
   <script src="feed.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

@@ -21,6 +21,7 @@ async function seedDatabase() {
     const users = await createUsers();
     const groups = await createGroups(users);
     await createPosts(users, groups);
+    await createFeedPosts(users); // ✅ פוסטים לפיד הראשי
 
     mongoose.disconnect();
     console.log('🎉 הסתיים בהצלחה');
@@ -50,18 +51,18 @@ async function createUsers() {
     console.log(`✅ משתמש נוצר: ${user.username}`);
   }
 
+  // 🔗 קשרי חברים
+  userDocs[0].friends.push(userDocs[1]._id, userDocs[2]._id); // david → miriam, yoav
+  userDocs[1].friends.push(userDocs[0]._id); // miriam → david
+  userDocs[2].friends.push(userDocs[0]._id); // yoav → david
+  for (const user of userDocs) await user.save();
+
   return userDocs;
 }
 
 async function getCoordinates(address) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
-
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': 'jewunity-seed-script'
-    }
-  });
-
+  const response = await fetch(url, { headers: { 'User-Agent': 'jewunity-seed-script' } });
   const data = await response.json();
 
   if (data && data.length > 0) {
@@ -70,7 +71,6 @@ async function getCoordinates(address) {
       coordinates: [parseFloat(data[0].lon), parseFloat(data[0].lat)]
     };
   }
-
   return null;
 }
 
@@ -88,16 +88,13 @@ async function createGroups(users) {
   for (let i = 0; i < groupData.length; i++) {
     const user = users[i % users.length];
     const groupInfo = groupData[i];
-
     const location = await getCoordinates(groupInfo.address);
     if (!location) {
       console.warn(`⚠️ לא נמצאה כתובת: ${groupInfo.address}`);
       continue;
     }
 
-    const members = [];
-    members.push({ userId: user._id, status: 'active' });
-
+    const members = [{ userId: user._id, status: 'active' }];
     for (let j = 1; j <= 3; j++) {
       const idx = (i + j) % users.length;
       if (users[idx]._id.toString() !== user._id.toString()) {
@@ -156,6 +153,28 @@ async function createPosts(users, groups) {
       await post.save();
       console.log(`✏️ פוסט נוצר בקבוצה "${group.name}" מאת ${author.username}`);
     }
+  }
+}
+
+async function createFeedPosts(users) {
+  const feedContents = [
+    'הפוסט האישי הראשון שלי בפיד 😄',
+    'מה נשמע חברים? פוסט מחוץ לקבוצה 🙌',
+    'התחלתי היום ללמוד Node.js! 🚀',
+    'המלצה על ספר מעניין 📖',
+    'מחשבות על חיבור בין קהילה לקוד ❤️💻'
+  ];
+
+  for (let i = 0; i < users.length; i++) {
+    const post = new Post({
+      content: feedContents[i % feedContents.length],
+      mediaType: 'text',
+      author: users[i]._id,
+      createdAt: new Date()
+    });
+
+    await post.save();
+    console.log(`📝 פוסט אישי נוצר עבור ${users[i].username}`);
   }
 }
 

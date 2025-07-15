@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = 'mySecretKey123';
 
+
 // רישום משתמש
 const registerUser = async (req, res) => {
   const { username, password, gender, birthDate, firstName, lastName } = req.body;
@@ -103,8 +104,80 @@ const clearUsers = async (req, res) => {
   }
 };
 
+
+
+const sendFriendRequest = async (req, res) => {
+  try {
+    const fromUserId = req.user.userId;
+    const toUserId = req.params.id;
+
+    if (fromUserId === toUserId) return res.status(400).json({ error: 'לא ניתן לשלוח בקשה לעצמך' });
+
+    const toUser = await User.findById(toUserId);
+    if (!toUser) return res.status(404).json({ error: 'משתמש לא נמצא' });
+
+    if (toUser.friendRequests.includes(fromUserId)) {
+      return res.status(400).json({ error: 'כבר שלחת בקשה' });
+    }
+
+    if (toUser.friends.includes(fromUserId)) {
+      return res.status(400).json({ error: 'כבר חברים' });
+    }
+
+    toUser.friendRequests.push(fromUserId);
+    await toUser.save();
+    res.json({ message: 'בקשת החברות נשלחה' });
+  } catch (err) {
+    res.status(500).json({ error: 'שגיאה בשליחת בקשה' });
+  }
+};
+
+const acceptFriendRequest = async (req, res) => {
+  try {
+    const toUserId = req.user.userId;
+    const fromUserId = req.params.id;
+
+    const toUser = await User.findById(toUserId);
+    const fromUser = await User.findById(fromUserId);
+    if (!toUser || !fromUser) return res.status(404).json({ error: 'משתמש לא נמצא' });
+
+    const requestIndex = toUser.friendRequests.indexOf(fromUserId);
+    if (requestIndex === -1) {
+      return res.status(400).json({ error: 'אין בקשה כזו' });
+    }
+
+    toUser.friendRequests.splice(requestIndex, 1);
+    toUser.friends.push(fromUserId);
+    fromUser.friends.push(toUserId);
+
+    await toUser.save();
+    await fromUser.save();
+
+    res.json({ message: 'חברות אושרה' });
+  } catch (err) {
+    res.status(500).json({ error: 'שגיאה באישור בקשה' });
+  }
+};
+
+
+const getFriends = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).populate('friends', 'username');
+    res.json(user.friends);
+  } catch (err) {
+    res.status(500).json({ error: 'שגיאה בשליפת חברים' });
+  }
+};
+
+
+
+
+
 module.exports = {
   registerUser,
   loginUser,
   clearUsers,
+  sendFriendRequest,
+  acceptFriendRequest,
+  getFriends,
 };

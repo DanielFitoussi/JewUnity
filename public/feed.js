@@ -1,7 +1,7 @@
 let token = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-token = localStorage.getItem('token')
+  token = localStorage.getItem('token')
   if (!token) {
     alert('You must be logged in to access the feed');
     window.location.href = 'login.html';
@@ -14,66 +14,72 @@ token = localStorage.getItem('token')
 
   renderMediaTypeChart(token);
 
-   fetchWeather();
+  fetchWeather();
 
 
-  const API_BASE_URL = 'http://localhost:3005/api/posts';
+  const FETCH_POSTS_URL = 'http://localhost:3005/api/posts/friends-feed';
+  const CREATE_POST_URL = 'http://localhost:3005/api/posts';
+
+
+
   const postForm = document.getElementById('postForm');
   const postsContainer = document.getElementById('postsContainer');
   const userId = parseJwt(token).userId;
 
- async function fetchWeather() {
-  try {
-    // שלב 1: בקשת המפתח מהשרת
-    const keyResponse = await fetch('/api/weather-key');
-    const keyData = await keyResponse.json();
-    const apiKey = keyData.apiKey;
+  async function fetchWeather() {
+    try {
+      // שלב 1: בקשת המפתח מהשרת
+      const keyResponse = await fetch('/api/weather-key');
+      const keyData = await keyResponse.json();
+      const apiKey = keyData.apiKey;
 
-    // שלב 2: בקשת מזג האוויר לפי המפתח שהתקבל
-    const city = 'Tel Aviv';
-    const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}&lang=he`
-    );
+      // שלב 2: בקשת מזג האוויר לפי המפתח שהתקבל
+      const city = 'Tel Aviv';
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}&lang=he`
+      );
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!data.main || !data.weather) {
-      throw new Error(`API error: ${data.message}`);
-    }
+      if (!data.main || !data.weather) {
+        throw new Error(`API error: ${data.message}`);
+      }
 
-    const weatherDiv = document.getElementById('weatherInfo');
-    const temp = data.main.temp;
-    const desc = data.weather[0].description;
+      const weatherDiv = document.getElementById('weatherInfo');
+      const temp = data.main.temp;
+      const desc = data.weather[0].description;
 
-    weatherDiv.innerHTML = `
+      weatherDiv.innerHTML = `
       <p><strong>${city}</strong></p>
       <p>🌡️ טמפרטורה: ${temp}°C</p>
       <p>🌤️ ${desc}</p>
     `;
-  } catch (err) {
-    document.getElementById('weatherInfo').innerText = 'שגיאה בטעינת מזג האוויר';
-    console.error('שגיאה ב-fetchWeather:', err);
+    } catch (err) {
+      document.getElementById('weatherInfo').innerText = 'שגיאה בטעינת מזג האוויר';
+      console.error('שגיאה ב-fetchWeather:', err);
+    }
   }
-}
 
 
 
   async function loadPosts() {
     try {
-      const response = await fetch(API_BASE_URL, {
+      const response = await fetch(FETCH_POSTS_URL, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
-    const posts = await response.json();
 
-// ניקוי תצוגה קודם
-postsContainer.innerHTML = '';
+      const posts = await response.json();
 
-// סינון פוסטים שלא שייכים לקבוצה
-const filteredPosts = posts.filter(post => !post.groupId);
+      // ניקוי תצוגה קודם
+      postsContainer.innerHTML = '';
 
-// הצגת הפוסטים הרלוונטיים
-filteredPosts.reverse().forEach(post => renderPost(post));
+      // ✅ סינון: רק פוסטים שלי ושל חבריי שלא שייכים לקבוצות
+      const filteredPosts = posts.filter(post => !post.groupId);
+
+      // ✅ הצגה
+      filteredPosts.reverse().forEach(post => renderPost(post));
+
 
     } catch (err) {
       console.error('Failed to load posts:', err);
@@ -97,7 +103,7 @@ filteredPosts.reverse().forEach(post => renderPost(post));
     }
 
     try {
-      const response = await fetch(API_BASE_URL, {
+      const response = await fetch(CREATE_POST_URL, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -135,6 +141,48 @@ filteredPosts.reverse().forEach(post => renderPost(post));
 
 
   loadPosts();
+
+
+
+  const showFriendsBtn = document.getElementById('showFriendsBtn');
+  const friendsPanel = document.getElementById('friendsPanel');
+  const friendsList = document.getElementById('friendsList');
+  const closeFriendsPanel = document.getElementById('closeFriendsPanel');
+
+  if (showFriendsBtn && friendsPanel && friendsList) {
+    showFriendsBtn.addEventListener('click', async () => {
+      try {
+        const response = await fetch('http://localhost:3005/api/users/friends', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const friends = await response.json();
+        friendsList.innerHTML = '';
+
+        if (friends.length === 0) {
+          friendsList.innerHTML = '<li class="list-group-item">אין חברים להצגה</li>';
+        } else {
+          friends.forEach(friend => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.textContent = `${friend.firstName} ${friend.lastName} (@${friend.username})`;
+            friendsList.appendChild(li);
+          });
+        }
+
+        friendsPanel.style.display = 'block';
+      } catch (err) {
+        console.error('שגיאה בשליפת חברים:', err);
+      }
+    });
+  }
+
+  if (closeFriendsPanel && friendsPanel) {
+    closeFriendsPanel.addEventListener('click', () => {
+      friendsPanel.style.display = 'none';
+    });
+  }
+
 });
 
 function parseJwt(token) {
@@ -149,7 +197,7 @@ function parseJwt(token) {
 
 function renderPost(post) {
   const postsContainer = document.getElementById('postsContainer');
-const token = localStorage.getItem('token')
+  const token = localStorage.getItem('token')
   const userId = parseJwt(token).userId;
 
   console.log("📩 מציג פוסט:", post);
@@ -582,6 +630,8 @@ async function searchPosts(query) {
   } catch (err) {
     console.error('Failed to search posts:', err);
   }
+
+
 }
 
 
