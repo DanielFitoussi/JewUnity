@@ -254,13 +254,18 @@ const getGroupPosts = async (req, res) => {
   const { groupId } = req.params;
 
   try {
-    const posts = await Post.find({ groupId }).populate('author', 'username');
+    const posts = await Post.find({ groupId })
+      .sort({ createdAt: -1 })
+      .populate('author', 'username firstName lastName') // מחבר הפוסט
+      .populate('comments.author', 'username'); // מחבר התגובה
+
     res.status(200).json(posts);
   } catch (err) {
     console.error('שגיאה בשליפת פוסטים לקבוצה:', err);
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 const getGroupById = async (req, res) => {
   const { groupId } = req.params;

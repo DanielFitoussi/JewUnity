@@ -254,8 +254,10 @@ const getFriendsFeed = async (req, res) => {
 
     // שליפת הפוסטים של המשתמש והחברים
     const posts = await Post.find({ 'author': { $in: friendIds } })
-      .sort({ createdAt: -1 })
-      .populate('author', 'username');
+  .sort({ createdAt: -1 })
+  .populate('author', 'username firstName lastName')
+  .populate('comments.author', 'username'); // ✅ יפתור את הבעיה
+
 
     res.json(posts);
   } catch (err) {
