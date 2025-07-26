@@ -27,4 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('שגיאה בטעינת מיקום קבוצות:', err);
   });
 
+  document.getElementById('backToFeed')?.addEventListener('click', () => {
+  window.location.href = 'feed.html';
+});
+
+
 });

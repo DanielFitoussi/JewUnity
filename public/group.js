@@ -250,9 +250,8 @@ const isMember = group.members.some(m => String(m.userId) === String(userId));
   const postElement = document.createElement('div');
   postElement.classList.add('post-card');
 
-  const fullName = post.author?.firstName && post.author?.lastName
-    ? `${post.author.firstName} ${post.author.lastName}`
-    : post.author?.username || 'משתמש לא ידוע';
+  const fullName = post.author?.username || 'משתמש לא ידוע';
+
 
   const header = document.createElement('div');
   header.className = 'd-flex justify-content-between align-items-center mb-2';
@@ -438,7 +437,8 @@ actionsWrapper.appendChild(commentCount);
     postElement.appendChild(commentSection);
 
 
-  postsContainer.insertBefore(postElement, postsContainer.firstChild);
+return postElement;
+
 
     // כפתורי עריכה ומחיקה - רק אם המשתמש הוא מחבר הפוסט
   if (post.author && post.author._id === userId) {
@@ -487,7 +487,7 @@ actionsWrapper.appendChild(commentCount);
         });
 
         if (res.ok) {
-          loadGroupPosts();
+         loadGroupPosts();
         } else {
           const result = await res.json();
           alert(result.error || 'שגיאה במחיקת הפוסט');
@@ -504,10 +504,16 @@ actionsWrapper.appendChild(commentCount);
 }
 
 
-  function renderPosts(posts) {
-    postsContainer.innerHTML = '';
-    posts.forEach(post => renderPost(post));
-  }
+function renderPosts(posts) {
+  postsContainer.innerHTML = '';
+  posts
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .forEach(post => {
+      const el = renderPost(post);
+      postsContainer.appendChild(el);
+    });
+}
+
 
   function showEditForm(post, postElement) {
   const oldContent = postElement.querySelector('p');
