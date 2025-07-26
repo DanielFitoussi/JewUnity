@@ -127,17 +127,18 @@ async function createPosts(users, groups) {
     'ממליץ לקרוא את פרשת השבוע!',
     'יש כאן מישהו מחיפה?',
     'מי בא להרצאה שלנו ביום שלישי?',
-    'בדקתי את זה בקוד – וזה עובד 🔥',
+    'בדקתי את השיר החדש – וזה 🔥',
     'מחשבה מהתפילה של הבוקר...',
     'המלצה על ספר: רמח"ל - דרך ה׳',
     'איך משלבים הלכה עם קריירה?'
   ];
 
   for (const group of groups) {
-    const numPosts = 3;
+    const numPosts = 2; // נוריד ל־2 טקסטואלים ונוסיף 1 עם תמונה
     const memberIds = group.members.map(m => m.userId.toString());
     const eligibleAuthors = users.filter(u => memberIds.includes(u._id.toString()));
 
+    // פוסטים רגילים
     for (let i = 0; i < numPosts; i++) {
       const author = eligibleAuthors[i % eligibleAuthors.length];
       const content = sampleContents[(i * 3 + group.name.length) % sampleContents.length];
@@ -151,13 +152,79 @@ async function createPosts(users, groups) {
       });
 
       await post.save();
-      console.log(`✏️ פוסט נוצר בקבוצה "${group.name}" מאת ${author.username}`);
+      console.log(`✏️ פוסט טקסט נוצר בקבוצה "${group.name}"`);
+    }
+
+    // פוסט עם תמונה ייחודית לפי הקבוצה
+    let mediaUrl = '';
+    let content = '';
+    if (group.name.includes('מוזיקה')) {
+      mediaUrl = 'uploads/harp-4865391_1280.jpg';
+      content = 'הנבל – הכלי של הלויים 🎼';
+    } else if (group.name.includes('טכנולוגיה')) {
+      mediaUrl = 'uploads/coding-1841550_1280.jpg';
+      content = 'כשהקוד פוגש את התורה 💻📖';
+    } else if (group.name.includes('תנ')) {
+      mediaUrl = 'uploads/magen-david-6254327_1280.jpg';
+      content = 'גאווה יהודית וסמל האחדות ✡️';
+    }
+
+    if (mediaUrl) {
+      const author = eligibleAuthors[0];
+      const postWithImage = new Post({
+        content,
+        author: author._id,
+        groupId: group._id,
+        mediaType: 'image',
+        mediaUrl,
+        createdAt: new Date()
+      });
+
+      await postWithImage.save();
+      console.log(`📸 פוסט עם תמונה נוצר בקבוצה "${group.name}"`);
     }
   }
 }
 
+
 async function createFeedPosts(users) {
-  const feedContents = [
+  const mediaPosts = [
+    {
+      content: 'ציור מרגש של מעבר ים סוף 🕊️',
+      mediaType: 'image',
+      mediaUrl: 'uploads/ai-generated-8555749_1280.jpg',
+      author: users[0]._id
+    },
+    {
+      content: 'נוף מרהיב של מצדה – עוצמה יהודית במדבר!',
+      mediaType: 'image',
+      mediaUrl: 'uploads/masada-national-park-7427144_1280.jpg',
+      author: users[1]._id
+    },
+    {
+      content: 'לראשונה ברכבת ישראל! ',
+      mediaType: 'video',
+      mediaUrl: 'uploads/32031-390497705_small.mp4',
+      author: users[2]._id
+    },
+    {
+      content: 'חנוכה שמח :)',
+      mediaType: 'video',
+      mediaUrl: 'uploads/249189_small.mp4',
+      author: users[3]._id
+    }
+  ];
+
+  for (const data of mediaPosts) {
+    await new Post({
+      ...data,
+      createdAt: new Date()
+    }).save();
+    console.log(`📸 פוסט עם מדיה נוצר עבור ${data.content}`);
+  }
+
+  // פוסטים טקסטואליים נוספים
+  const textContents = [
     'הפוסט האישי הראשון שלי בפיד 😄',
     'מה נשמע חברים? פוסט מחוץ לקבוצה 🙌',
     'התחלתי היום ללמוד Node.js! 🚀',
@@ -167,15 +234,16 @@ async function createFeedPosts(users) {
 
   for (let i = 0; i < users.length; i++) {
     const post = new Post({
-      content: feedContents[i % feedContents.length],
+      content: textContents[i % textContents.length],
       mediaType: 'text',
       author: users[i]._id,
       createdAt: new Date()
     });
 
     await post.save();
-    console.log(`📝 פוסט אישי נוצר עבור ${users[i].username}`);
+    console.log(`📝 פוסט טקסט נוצר עבור ${users[i].username}`);
   }
 }
+
 
 seedDatabase();
