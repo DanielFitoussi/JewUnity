@@ -283,7 +283,7 @@ const groupWithAdmin = {
   name: group.name,
   description: group.description,
   address: group.address,
-  location: group.location, // ✅ הוספת מיקום!
+  location: group.location, //  הוספת מיקום!
   members: group.members.map(m => ({
     _id: m.userId?._id,
     username: m.userId?.username || 'משתמש לא ידוע'
@@ -316,13 +316,13 @@ const leaveGroup = async (req, res) => {
       return res.status(400).json({ error: 'Owner cannot leave their own group' });
     }
 
-    // ✅ לפני הסינון – נציג את החברים הנוכחיים
+    //  לפני הסינון – נציג את החברים הנוכחיים
     console.log('👥 לפני הסינון:', group.members.map(m => m.userId.toString()));
 
     const initialCount = group.members.length;
     group.members = group.members.filter(m => m.userId.toString() !== userId);
 
-    // ✅ אחרי הסינון – נציג את הרשימה החדשה
+    //  אחרי הסינון – נציג את הרשימה החדשה
     console.log('👥 אחרי הסינון:', group.members.map(m => m.userId.toString()));
 
     if (group.members.length === initialCount) {
